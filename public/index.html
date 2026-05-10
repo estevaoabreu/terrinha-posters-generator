@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Criatividade Computacional - Imagen 3</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        #canvas { margin-top: 20px; border: 1px solid #ccc; min-width: 300px; min-height: 300px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px 20px; cursor: pointer; background: #4285f4; color: white; border: none; }
+    </style>
+</head>
+<body>
+
+    <h1>Gerador de Arte IA</h1>
+    <p>Insere uma descrição para começar o teu projeto:</p>
+    
+    <div>
+        <input type="text" id="promptInput" placeholder="Ex: Um astronauta a tocar guitarra em Marte...">
+        <button id="generateBtn">Gerar Imagem</button>
+    </div>
+
+    <div id="canvas">
+        <p id="status"></p>
+        <img id="outputImage" src="" style="max-width: 512px; display: none;">
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
