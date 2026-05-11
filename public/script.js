@@ -1,5 +1,8 @@
 document.getElementById("generateBtn").addEventListener("click", async () => {
-  const prompt = document.getElementById("promptInput").value;
+  const prompt =
+    "Cria uma imagem fotorrealista de uma escultura do Santo " +
+    document.getElementById("promptInput").value +
+    ". Baseia-te em imagens e historias desse santo. A imagem deve ter luz e composição pouco profissional.";
   const status = document.getElementById("status");
   const imgElement = document.getElementById("outputImage");
 
@@ -14,7 +17,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
     const result = await response.json();
     if (result.success) {
-      // A API da Google costuma devolver a string base64 pura
       imgElement.src = `data:image/png;base64,${result.data.bytesBase64Encoded}`;
       imgElement.style.display = "block";
     }

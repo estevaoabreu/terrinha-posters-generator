@@ -11,15 +11,17 @@ app.post("/generate-image", async (req, res) => {
   try {
     const { prompt } = req.body;
 
-    // Usando a API do Google AI Studio com a chave em vez do Vertex AI (não precisa de gcloud)
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        instances: [{ prompt: prompt }],
-        parameters: { sampleCount: 1 },
-      }),
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ prompt: prompt }],
+          parameters: { sampleCount: 1 },
+        }),
+      },
+    );
 
     const data = await response.json();
 
@@ -27,7 +29,6 @@ app.post("/generate-image", async (req, res) => {
       throw new Error(data.error.message);
     }
 
-    // A resposta da API do AI Studio já traz o base64
     const base64Encoded = data.predictions[0].bytesBase64Encoded;
 
     res.json({ success: true, data: { bytesBase64Encoded: base64Encoded } });
