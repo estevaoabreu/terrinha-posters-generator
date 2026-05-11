@@ -1,0 +1,32 @@
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 50px;
+}
+
+#canvas {
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  min-width: 300px;
+  min-height: 300px;
+}
+
+input {
+  padding: 10px;
+  width: 300px;
+}
+
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #4285f4;
+  color: white;
+  border: none;
+}
+
+#outputImage {
+  max-width: 512px;
+  display: none;
+}

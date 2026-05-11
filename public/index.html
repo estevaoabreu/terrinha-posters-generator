@@ -3,32 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <title>Terrinhas Poster Generator</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 50px;
-      }
-      #canvas {
-        margin-top: 20px;
-        border: 1px solid #ccc;
-        min-width: 300px;
-        min-height: 300px;
-      }
-      input {
-        padding: 10px;
-        width: 300px;
-      }
-      button {
-        padding: 10px 20px;
-        cursor: pointer;
-        background: #4285f4;
-        color: white;
-        border: none;
-      }
-    </style>
+    <link rel="stylesheet" href="css.css" type="text/css" />
+    <script src="/p5.min.js"></script>
   </head>
   <body>
     <p>Insere o nome de um Santo:</p>
@@ -44,15 +20,27 @@
         id="promptInputLocalidade"
         placeholder="[Nome da localidade]"
       />
-      <input type="text" id="promptInputDia" placeholder="[Data da festa]..." />
+      <input
+        type="text"
+        id="promptPrograma"
+        placeholder="[Contéudo do programa]"
+      />
+      <input
+        type="number"
+        id="promptNúmeroLogos"
+        placeholder="[Número de logos]"
+      />
+      <input type="text" id="promptInputDia" placeholder="[Data da festa]" />
       <button id="generateBtn">Gerar Imagem</button>
     </div>
 
     <div id="canvas">
       <p id="status"></p>
-      <img id="outputImage" src="" style="max-width: 512px; display: none" />
+      <img id="outputImage" src="" />
     </div>
+    <div id="sketch"></div>
 
+    <script src="sketch.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
