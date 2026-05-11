@@ -1,28 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <title>Terrinhas Posters Generator</title>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Terrinhas Poster Generator</title>
     <style>
-        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
-        #canvas { margin-top: 20px; border: 1px solid #ccc; min-width: 300px; min-height: 300px; }
-        input { padding: 10px; width: 300px; }
-        button { padding: 10px 20px; cursor: pointer; background: #4285f4; color: white; border: none; }
+      body {
+        font-family: sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px;
+      }
+      #canvas {
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        min-width: 300px;
+        min-height: 300px;
+      }
+      input {
+        padding: 10px;
+        width: 300px;
+      }
+      button {
+        padding: 10px 20px;
+        cursor: pointer;
+        background: #4285f4;
+        color: white;
+        border: none;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <p>Insere o nome de um Santo:</p>
-    
+
     <div>
-        <input type="text" id="promptInput" placeholder="[São/Santo/Santa]...">
-        <button id="generateBtn">Gerar Imagem</button>
+      <input
+        type="text"
+        id="promptInputSanto"
+        placeholder="[São/Santo/Santa]..."
+      />
+      <input
+        type="text"
+        id="promptInputLocalidade"
+        placeholder="[Nome da localidade]"
+      />
+      <input type="text" id="promptInputDia" placeholder="[Data da festa]..." />
+      <button id="generateBtn">Gerar Imagem</button>
     </div>
 
     <div id="canvas">
-        <p id="status"></p>
-        <img id="outputImage" src="" style="max-width: 512px; display: none;">
+      <p id="status"></p>
+      <img id="outputImage" src="" style="max-width: 512px; display: none" />
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
