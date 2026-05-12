@@ -8,7 +8,6 @@ body {
 
 #canvas {
   margin-top: 20px;
-  border: 1px solid #ccc;
   min-width: 300px;
   min-height: 300px;
 }
@@ -26,7 +25,7 @@ button {
   border: none;
 }
 
-#outputImage {
+.outputImage {
   max-width: 512px;
-  display: none;
+  border: 2px solid #ccc;
 }

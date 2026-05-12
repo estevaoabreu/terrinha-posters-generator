@@ -1,27 +1,29 @@
 document.getElementById("generateBtn").addEventListener("click", async () => {
   const prompt =
-    "Cria uma imagem de uma escultura de corpo inteiro de São/Santo/Santa " +
+    "Fotografia amadora de uma escultura sacra de corpo inteiro de São/Santo/Santa " +
     document.getElementById("promptInputSanto").value +
-    ", feita em madeira policromada com tons coloridos. Baseia-te em representações já existentes e histórias desse santo, para utilizar símbolos e imagens associados a esse santo. A foto deve ser tirada de frente, a uma distância média, capturando a figura inteira do santo. A iluminação deve ser fraca, e a escultura deve estar ligeiramente desgastada. A composição deve ser simples e direta, sem elementos distrativos, simulando uma foto tirada por um amador.";
+    ", esculpida em madeira policromada com pintura antiga, cores suaves e tons coloridos. A estátua deve exibir sinais de desgaste natural. Incluir atributos iconográficos tradicionais e símbolos históricos do santo. Captura frontal, distância média, enquadramento simples e direto. Iluminação ambiente fraca e natural, sombras suaves, sem flash profissional. Fundo neutro de igreja ou nicho, sem distrações, simulando uma fotografia documental básica.";
   const status = document.getElementById("status");
-  const imgElement = document.getElementById("outputImage");
+  const imgElement = document.querySelectorAll(".outputImage");
 
-  status.innerText = "A solicitar ao servidor...";
+  status.innerText = "A gerar imagem...";
 
-  try {
-    const response = await fetch("/generate-image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: prompt }),
-    });
+  imgElement.forEach(async (img) => {
+    try {
+      const response = await fetch("/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: prompt }),
+      });
 
-    const result = await response.json();
-    if (result.success) {
-      imgElement.src = `data:image/png;base64,${result.data}`;
-      imgElement.style.display = "block";
-      status.innerText = "";
+      const result = await response.json();
+      if (result.success) {
+        img.src = `data:image/png;base64,${result.data}`;
+        img.style.display = "block";
+        status.innerText = "";
+      }
+    } catch (err) {
+      status.innerText = "Erro na comunicação com o servidor.";
     }
-  } catch (err) {
-    status.innerText = "Erro na comunicação com o servidor.";
-  }
+  });
 });
