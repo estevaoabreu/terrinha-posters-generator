@@ -8,22 +8,28 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
   status.innerText = "A gerar imagem...";
 
-  imgElement.forEach(async (img) => {
-    try {
+  try {
+    const fetchPromises = Array.from(imgElement).map(async (img) => {
       const response = await fetch("/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt: prompt }),
       });
-
       const result = await response.json();
+      return { img, result };
+    });
+
+    const results = await Promise.all(fetchPromises);
+
+    results.forEach(({ img, result }) => {
       if (result.success) {
         img.src = `data:image/png;base64,${result.data}`;
         img.style.display = "block";
-        status.innerText = "";
       }
-    } catch (err) {
-      status.innerText = "Erro na comunicação com o servidor.";
-    }
-  });
+    });
+
+    status.innerText = "";
+  } catch (err) {
+    status.innerText = "Erro na comunicação com o servidor.";
+  }
 });
