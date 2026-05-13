@@ -9,22 +9,26 @@
   <body>
     <p>Insere o nome de um Santo:</p>
 
-    <div>
       <input
         type="text"
-        id="promptInputSanto"
-        placeholder="[São/Santo/Santa]..."
+        id="promptInputLocalidade"
+        placeholder="[Nome da localidade]"
       />
+      <input
+        type="text"
+        id="promptPrograma"
+        placeholder="[Contéudo do programa]"
+      />
+      <input
+        type="number"
+        id="promptNúmeroLogos"
+        placeholder="[Número de logos]"
+      />
+      <input type="text" id="promptInputDia" placeholder="[Data da festa]" />
       <button id="generateBtn">Gerar Imagem</button>
     </div>
 
-    <p id="status"></p>
-
-    <div id="canvas">
-      <img class="outputImage" src="" />
-      <img class="outputImage" src="" />
-      <img class="outputImage" src="" />
-    </div>
+    <div id="sketch"></div>
 
     <script src="sketch.js"></script>
     <script src="script.js"></script>
