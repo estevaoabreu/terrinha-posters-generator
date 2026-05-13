@@ -51,9 +51,9 @@ app.post("/generate-image", async (req, res) => {
 
     const imageBuffer = Buffer.from(base64, "base64");
 
-    const inputPath = path.join(__dirname, "temp-input.png");
-
-    const outputPath = path.join(__dirname, "temp-output.png");
+    const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const inputPath = path.join(__dirname, `temp-input-${uniqueId}.png`);
+    const outputPath = path.join(__dirname, `temp-output-${uniqueId}.png`);
 
     await sharp(imageBuffer).png().toFile(inputPath);
 
