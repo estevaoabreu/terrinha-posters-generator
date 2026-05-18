@@ -4,27 +4,28 @@
     <meta charset="UTF-8" />
     <title>Terrinhas Poster Generator</title>
     <link rel="stylesheet" href="css.css" type="text/css" />
+    <script src="fonts.js"></script>
     <script src="/p5.min.js"></script>
   </head>
   <body>
-    <p>Insere o nome de um Santo:</p>
+    <p>Insere as informações sobre a festa:</p>
 
       <input
         type="text"
         id="promptInputLocalidade"
-        placeholder="[Nome da localidade]"
+        placeholder="Nome da festa"
       />
-      <input
-        type="text"
+      <textarea
         id="promptPrograma"
-        placeholder="[Contéudo do programa]"
-      />
+        placeholder="Programa"
+      ></textarea>
       <input
         type="number"
         id="promptNúmeroLogos"
-        placeholder="[Número de logos]"
+        placeholder="Número de logos"
+        min="0" step="1"
       />
-      <input type="text" id="promptInputDia" placeholder="[Data da festa]" />
+      <input type="text" id="promptInputDia" placeholder="Data" />
       <button id="generateBtn">Gerar Imagem</button>
     </div>
 

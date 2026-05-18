@@ -7,6 +7,9 @@ var sketch = function (sketch) {
   let imagensCarregadas = [];
   let saintImage;
 
+  let selectedTitleFont;
+  let selectedBodyFont;
+
   // -> Quantas imagens "Frame X" tens na pasta?
   let quantidadeDeImagens = 3;
 
@@ -51,13 +54,44 @@ var sketch = function (sketch) {
   sketch.setup = function () {
     sketch.createCanvas(600, 850);
 
+    // Read form values and override default userData if not empty
+    let inputLocalidade = document.getElementById(
+      "promptInputLocalidade",
+    )?.value;
+    if (inputLocalidade && inputLocalidade.trim() !== "") {
+      userData.nomeTerrinha = inputLocalidade;
+    }
+
+    let inputDia = document.getElementById("promptInputDia")?.value;
+    if (inputDia && inputDia.trim() !== "") {
+      userData.dataEvento = inputDia;
+    }
+
+    let inputPrograma = document.getElementById("promptPrograma")?.value;
+    if (inputPrograma && inputPrograma.trim() !== "") {
+      // Allow newline replacement if user types \n literally
+      userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
+    }
+
     userData.artistas = imagensCarregadas;
 
     let templatesArray = Object.values(templatesDB);
     let randomIndex = sketch.floor(sketch.random(templatesArray.length));
     selectedTemplate = templatesArray[randomIndex].annotations[0].result;
 
+    // Pick random fonts
+    selectedTitleFont = sketch.random(titleFonts);
+    selectedBodyFont = sketch.random(bodyFonts);
+
     sketch.noLoop();
+
+    // Redraw once fonts are fully loaded to avoid fallback font rendering
+    // Since we preloaded them at the top of the file, this should resolve instantly
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        sketch.redraw();
+      });
+    }
   };
 
   // ==========================================
@@ -101,6 +135,7 @@ var sketch = function (sketch) {
   // ==========================================
   function renderContent(label, x, y, w, h, conteudoDinamico) {
     sketch.noStroke();
+    sketch.textFont(`"${selectedBodyFont}"`);
 
     if (label.includes("Sant@ (Figura)")) {
       if (saintImage) {
@@ -115,8 +150,9 @@ var sketch = function (sketch) {
       }
     } else if (label.includes("Nome da Terrinha")) {
       sketch.fill(255, 255, 0); // Amarelo clássico
+      sketch.textFont(`"${selectedTitleFont}"`);
       // Chama a função especial que estica o texto para caber no w e h!
-      drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.BOLD);
+      drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.NORMAL);
     } else if (label.includes("Data do Evento")) {
       sketch.fill(0, 255, 255); // Ciano
       drawTextFitted(userData.dataEvento, x, y, w, h, sketch.BOLD);
@@ -195,4 +231,9 @@ var sketch = function (sketch) {
   }
 };
 
-let posterSketch = new p5(sketch, "sketch");
+// Run the sketch ONLY when the user clicks 'Gerar Imagem'
+document.getElementById("generateBtn").addEventListener("click", () => {
+  // Clear any existing sketch
+  document.getElementById("sketch").innerHTML = "";
+  let posterSketch = new p5(sketch, "sketch");
+});

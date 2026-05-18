@@ -25,6 +25,10 @@ button {
   border: none;
 }
 
+h1 {
+  font-family: "Lobster";
+}
+
 .outputImage {
   max-width: 512px;
   border: 2px solid #ccc;

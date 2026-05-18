@@ -1,89 +1,66 @@
 require("dotenv").config();
 
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
-const sharp = require("sharp");
+const sharp = require("sharp"); // fs e path já não são necessários!
+const { removeBackground } = require("@imgly/background-removal-node");
 
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
-
-const { removeBackground } = require("@imgly/background-removal-node");
 
 const app = express();
 
 app.use(express.json());
 app.use(express.static("public"));
 
-const API_KEY = process.env.GEMINI_API_KEY;
+// A API Key estava declarada mas não estava a ser usada no Pollinations
+// const API_KEY = process.env.GEMINI_API_KEY;
 
 app.post("/generate-image", async (req, res) => {
   try {
-    const { prompt } = req.body;
+    const { prompt, count } = req.body;
+    const numImages = count || 1;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          instances: [
-            {
-              prompt: prompt,
-            },
-          ],
-          parameters: {
-            sampleCount: 1,
-          },
-        }),
+    console.log(
+      `Pedido recebido para gerar ${numImages} variações em paralelo.`,
+    );
+
+    // Criamos um array de "Promessas" para executar tudo ao mesmo tempo
+    const imagePromises = Array.from({ length: numImages }).map(
+      async (_, i) => {
+        const randomSeed = Math.floor(Math.random() * 9999999);
+        const encodedPrompt = encodeURIComponent(prompt);
+
+        // Resolução reduzida para 512x512 para gerar imagens de forma mais rápida
+        const url = `https://image.pollinations.ai/p/${encodedPrompt}?width=512&height=512&nologo=true&enhance=true&seed=${randomSeed}`;
+
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Erro ao obter imagem.");
+
+        const imageBuffer = Buffer.from(await response.arrayBuffer());
+        const pngBuffer = await sharp(imageBuffer).png().toBuffer();
+
+        const blob = await removeBackground(pngBuffer);
+        const arrayBuffer = await blob.arrayBuffer();
+
+        console.log(`Variação ${i + 1} concluída.`);
+        return Buffer.from(arrayBuffer).toString("base64");
       },
     );
 
-    const data = await response.json();
-
-    if (data.error) {
-      throw new Error(data.error.message);
-    }
-
-    const base64 = data.predictions[0].bytesBase64Encoded;
-
-    const imageBuffer = Buffer.from(base64, "base64");
-
-    const uniqueId = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const inputPath = path.join(__dirname, `temp-input-${uniqueId}.png`);
-    const outputPath = path.join(__dirname, `temp-output-${uniqueId}.png`);
-
-    await sharp(imageBuffer).png().toFile(inputPath);
-
-    const fileUrl = `file:///${inputPath.replace(/\\/g, "/")}`;
-
-    const blob = await removeBackground(fileUrl);
-
-    const arrayBuffer = await blob.arrayBuffer();
-
-    fs.writeFileSync(outputPath, Buffer.from(arrayBuffer));
-
-    const transparentBase64 = fs.readFileSync(outputPath).toString("base64");
-
-    fs.unlinkSync(inputPath);
-    fs.unlinkSync(outputPath);
+    // O servidor vai executar todas as funções de cima ao mesmo tempo e esperar que TODAS terminem
+    const outputImagesBase64 = await Promise.all(imagePromises);
 
     res.json({
       success: true,
-      data: transparentBase64,
+      images: outputImagesBase64,
     });
   } catch (error) {
-    console.error("ERRO:", error);
-
-    res.status(500).json({
-      error: error.message,
-    });
+    console.error("ERRO NA GERAÇÃO:", error);
+    res.status(500).json({ error: error.message });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor em http://localhost:${PORT}`);
+  console.log(`Servidor a correr em http://localhost:${PORT}`);
 });
