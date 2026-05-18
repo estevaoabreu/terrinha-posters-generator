@@ -5,6 +5,7 @@ var sketch = function (sketch) {
   let templatesDB;
   let selectedTemplate;
   let imagensCarregadas = [];
+  let saintImage;
 
   // -> Quantas imagens "Frame X" tens na pasta?
   let quantidadeDeImagens = 3;
@@ -36,6 +37,11 @@ var sketch = function (sketch) {
     for (let i = 1; i <= quantidadeDeImagens; i++) {
       let caminhoDaImagem = "ImagensArtistas/Frame " + i + ".png"; // muda para .jpg se necessário
       imagensCarregadas.push(sketch.loadImage(caminhoDaImagem));
+    }
+
+    let storedSaintImage = localStorage.getItem("selectedSaintImage");
+    if (storedSaintImage) {
+      saintImage = sketch.loadImage(storedSaintImage);
     }
   };
 
@@ -97,12 +103,16 @@ var sketch = function (sketch) {
     sketch.noStroke();
 
     if (label.includes("Sant@ (Figura)")) {
-      sketch.fill(255, 200, 0, 80);
-      sketch.rect(x, y, w, h, 10);
-      sketch.fill(255);
-      sketch.textAlign(sketch.CENTER, sketch.CENTER);
-      sketch.textSize(18);
-      sketch.text("[SANTO]", x + w / 2, y + h / 2);
+      if (saintImage) {
+        sketch.image(saintImage, x, y, w, h);
+      } else {
+        sketch.fill(255, 200, 0, 80);
+        sketch.rect(x, y, w, h, 10);
+        sketch.fill(255);
+        sketch.textAlign(sketch.CENTER, sketch.CENTER);
+        sketch.textSize(18);
+        sketch.text("[SANTO]", x + w / 2, y + h / 2);
+      }
     } else if (label.includes("Nome da Terrinha")) {
       sketch.fill(255, 255, 0); // Amarelo clássico
       // Chama a função especial que estica o texto para caber no w e h!

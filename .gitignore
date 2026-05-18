@@ -11,3 +11,6 @@ Thumbs.db
 # Build output
 dist/
 out/
+
+temp-input-*.png
+temp-output-*.png

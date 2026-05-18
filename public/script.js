@@ -33,3 +33,17 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     status.innerText = "Erro na comunicação com o servidor.";
   }
 });
+
+document.querySelectorAll(".outputImage").forEach((img) => {
+  img.addEventListener("click", () => {
+    if (!img.src || img.src === window.location.href || img.src.endsWith(".html")) return;
+
+    document.querySelectorAll(".outputImage").forEach((el) => {
+      el.classList.remove("selected");
+    });
+
+    img.classList.add("selected");
+
+    localStorage.setItem("selectedSaintImage", img.src);
+  });
+});
