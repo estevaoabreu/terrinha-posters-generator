@@ -5,35 +5,35 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     return;
   }
 
-  const prompt =
-    "Fotografia amadora de uma escultura sacra de corpo inteiro de São/Santo/Santa " +
-    promptInput +
-    ", esculpida em madeira policromada com pintura antiga, cores suaves e tons coloridos. A estátua deve exibir sinais de desgaste natural. Incluir atributos iconográficos tradicionais e símbolos históricos do santo. Captura frontal, distância média, enquadramento simples e direto. Iluminação ambiente fraca e natural, sombras suaves, sem flash profissional. Fundo neutro de igreja ou nicho, sem distrações, simulando uma fotografia documental básica.";
-
+  const prompt = `Amateur documentary photograph of a full-body sacred wooden sculpture of Saint ${promptInput}, antique polychrome carved wood, faded pastel colors, natural signs of aging, cracked paint and weathered wood textures. Holding traditional iconographic attributes and holy symbols. Medium shot, frontal view, simple direct framing, 50mm lens. Dim natural church ambient lighting, soft shadows, unedited, no flash. Neutral dark church niche background, photorealistic, high resolution.`;
   const status = document.getElementById("status");
   const imgElements = document.querySelectorAll(".outputImage");
-
-  status.innerText = "A iniciar geração...";
+  let loadingInterval;
 
   try {
-    // Apaga as imagens antigas enquanto gera as novas
     imgElements.forEach((img) => {
       img.style.display = "none";
       img.src = "";
     });
 
-    // Geramos uma imagem de cada vez para podermos dar feedback ao utilizador
     for (let i = 0; i < imgElements.length; i++) {
-      status.innerText = `A gerar imagem ${i + 1} de ${imgElements.length}... Por favor, aguarde.`;
+      let dotCount = 0;
+      status.innerText = `A gerar imagem ${i + 1}/${imgElements.length}`;
+      loadingInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4;
+        status.innerText = `A gerar imagem ${i + 1}/${imgElements.length}${".".repeat(dotCount)}`;
+      }, 500);
 
       const response = await fetch("/generate-image", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           prompt: prompt,
-          count: 1, // Pede apenas 1 imagem de cada vez
+          count: 1,
         }),
       });
+
+      clearInterval(loadingInterval);
 
       const result = await response.json();
 
@@ -45,8 +45,9 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       }
     }
 
-    status.innerText = "Geração concluída com sucesso!";
+    status.innerText = "Imagens geradas com sucesso!";
   } catch (err) {
+    if (loadingInterval) clearInterval(loadingInterval);
     status.innerText = "Erro na comunicação com o servidor.";
   }
 });
