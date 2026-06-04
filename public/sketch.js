@@ -13,6 +13,7 @@ var sketch = function (sketch) {
   let imagensArtistas = [];
   let logos = [];
   let saintImage;
+  let saintDrawn = false;
 
   let selectedTitleFont;
   let selectedBodyFont;
@@ -20,12 +21,12 @@ var sketch = function (sketch) {
   let paletaAtiva = null;
 
   let userData = {
-    nomeTerrinha: "JOÃO",
+    nomeTerrinha: "FESTAS DE SÃO JOÃO",
     dataEvento: "23 A 25 DE JUNHO",
     local: "Largo da Igreja, Ribeira",
     programacao: [
       "SEXTA:\n22h - Quim Barreiros",
-      "SÁBADO:\n21h - Banda X\n23h - Fogo",
+      "SÁBADO:\n21h - Banda Pimba\n23h - Fogo de Artifício",
       "DOMINGO:\n15h - Missa",
     ],
     patrocinios: "Café Central | Talho do Zé | Junta de Freguesia",
@@ -55,7 +56,7 @@ var sketch = function (sketch) {
     let inputLocalidade = document
       .getElementById("promptInputLocalidade")
       ?.value?.trim();
-    if (inputLocalidade) userData.nomeTerrinha = inputLocalidade;
+    if (inputLocalidade) userData.nomeTerrinha = inputLocalidade.toUpperCase();
 
     let inputDia = document.getElementById("promptInputDia")?.value?.trim();
     if (inputDia) userData.dataEvento = inputDia;
@@ -67,7 +68,7 @@ var sketch = function (sketch) {
       userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
     }
 
-    userData.artistas = imagensArtistas;
+    userData.artistas = sketch.shuffle(imagensArtistas.slice());
 
     if (typeof resolverPaleta === "function") {
       paletaAtiva = resolverPaleta(inputLocalidade || null);
@@ -98,6 +99,7 @@ var sketch = function (sketch) {
   };
 
   sketch.draw = function () {
+    saintDrawn = false;
     const [bgA, bgB] = paletaAtiva.gradient;
     _drawGradientBackground(bgA, bgB);
 
@@ -164,13 +166,14 @@ var sketch = function (sketch) {
     const [corTitulo, corData] = paletaAtiva.text;
 
     if (label.includes("Sant@ (Figura)")) {
-      if (saintImage) {
-        sketch.image(saintImage, x, y, w, h);
+      if (saintImage && !saintDrawn) {
+        drawImageContain(saintImage, x, y, w, h);
+        saintDrawn = true;
       }
     } else if (label.includes("Nome da Terrinha")) {
       sketch.fill(corTitulo);
       sketch.textFont(`"${selectedTitleFont}"`);
-      drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.NORMAL);
+      drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.NORMAL, 48);
     } else if (label.includes("Data do Evento")) {
       sketch.fill(corData);
       drawTextFitted(userData.dataEvento, x, y, w, h, sketch.BOLD);
@@ -186,7 +189,7 @@ var sketch = function (sketch) {
       sketch.text(conteudoDinamico, x, y, w, h);
     } else if (label.includes("Artista (Imagem)")) {
       if (conteudoDinamico) {
-        sketch.image(conteudoDinamico, x, y, w, h);
+        drawImageCover(conteudoDinamico, x, y, w, h);
       } else {
         sketch.fill(255, 50, 100, 80);
         sketch.rect(x, y, w, h, 5);
@@ -204,7 +207,7 @@ var sketch = function (sketch) {
     }
   }
 
-  function drawTextFitted(txt, x, y, w, h, style) {
+  function drawTextFitted(txt, x, y, w, h, style, minSize = 0) {
     sketch.push();
     sketch.translate(x + w / 2, y + h / 2);
 
@@ -219,9 +222,51 @@ var sketch = function (sketch) {
     let scaleFactor = sketch.min(w / tw, h / th);
     let optimalSize = baseSize * scaleFactor * 0.9;
 
+    if (optimalSize < minSize) {
+      optimalSize = minSize;
+    }
+
     sketch.textSize(optimalSize);
     sketch.text(txt, 0, 0);
     sketch.pop();
+  }
+
+  function drawImageCover(img, x, y, w, h) {
+    let imgRatio = img.width / img.height;
+    let boxRatio = w / h;
+    let sx, sy, sw, sh;
+
+    if (imgRatio > boxRatio) {
+      sh = img.height;
+      sw = img.height * boxRatio;
+      sx = (img.width - sw) / 2;
+      sy = 0;
+    } else {
+      sw = img.width;
+      sh = img.width / boxRatio;
+      sx = 0;
+      sy = (img.height - sh) / 2;
+    }
+    sketch.image(img, x, y, w, h, sx, sy, sw, sh);
+  }
+
+  function drawImageContain(img, x, y, w, h) {
+    let imgRatio = img.width / img.height;
+    let boxRatio = w / h;
+    let dw, dh, dx, dy;
+
+    if (imgRatio > boxRatio) {
+      dw = w;
+      dh = w / imgRatio;
+      dx = x;
+      dy = y + (h - dh) / 2;
+    } else {
+      dh = h;
+      dw = h * imgRatio;
+      dy = y;
+      dx = x + (w - dw) / 2;
+    }
+    sketch.image(img, dx, dy, dw, dh);
   }
 };
 
