@@ -6,15 +6,13 @@
     <link rel="stylesheet" href="css.css" type="text/css" />
   </head>
   <body>
-    <p>Insere o nome de um Santo:</p>
-
     <div>
       <input
         type="text"
         id="promptInputSanto"
-        placeholder="São/Santo/Santa..."
+        placeholder="Insere o nome de um São/Santo/Santa..."
       />
-      <button id="generateBtn">Gerar Imagem</button>
+      <button id="generateBtn">Gerar Imagens</button>
     </div>
 
     <p id="status"></p>
@@ -25,7 +23,13 @@
       <img class="outputImage" src="" />
     </div>
 
-    <a href="poster-generator.html">Continuar</a>
-    <script src="script.js"></script>
+    <button
+      id="continueBtn"
+      onclick="window.location.href = 'poster-generator.html'"
+    >
+      Continuar para Geração de Cartazes
+    </button>
   </body>
+  <script src="script.js"></script>
+  <script src="randomBg.js"></script>
 </html>

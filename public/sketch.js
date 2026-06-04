@@ -136,13 +136,6 @@ var sketch = function (sketch) {
     if (label.includes("Sant@ (Figura)")) {
       if (saintImage) {
         sketch.image(saintImage, x, y, w, h);
-      } else {
-        sketch.fill(255, 200, 0, 80);
-        sketch.rect(x, y, w, h, 10);
-        sketch.fill(255);
-        sketch.textAlign(sketch.CENTER, sketch.CENTER);
-        sketch.textSize(18);
-        sketch.text("[SANTO]", x + w / 2, y + h / 2);
       }
     } else if (label.includes("Nome da Terrinha")) {
       sketch.fill(255, 255, 0); // Amarelo clássico

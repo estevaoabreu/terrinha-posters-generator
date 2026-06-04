@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -11,17 +12,11 @@ body {
 }
 
 #start {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-
   h1 {
     width: 60%;
     color: #ffffff;
     font-size: 5em;
+    margin-top: -0.5em;
   }
 
   p {
