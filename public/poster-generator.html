@@ -2,36 +2,56 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <title>Terrinhas Poster Generator</title>
-    <link rel="stylesheet" href="css.css" type="text/css" />
-    <script src="fonts.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terrinhas — Gerador de Cartaz</title>
+    <link rel="stylesheet" href="css.css" />
+    <script src="fonts.js" defer></script>
     <script src="/p5.min.js"></script>
   </head>
   <body>
-    <p>Insere as informações sobre a festa:</p>
+    <div class="form-wrapper">
+      <p>Insere as informações sobre a festa</p>
 
+      <label for="promptInputLocalidade" class="sr-only">Nome da localidade / festa</label>
       <input
         type="text"
         id="promptInputLocalidade"
-        placeholder="Nome da festa"
+        placeholder="Nome da localidade / festa"
+        autocomplete="off"
       />
+
+      <label for="promptPrograma" class="sr-only">Programa da festa</label>
       <textarea
         id="promptPrograma"
-        placeholder="Programa"
+        placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"
       ></textarea>
+
+      <label for="promptNúmeroLogos" class="sr-only">Número de logos de patrocinadores</label>
       <input
         type="number"
         id="promptNúmeroLogos"
-        placeholder="Número de logos"
-        min="0" step="1"
+        placeholder="Nº de logos de patrocinadores"
+        min="0"
+        step="1"
       />
-      <input type="text" id="promptInputDia" placeholder="Data" />
-      <button id="generateBtn">Gerar Imagem</button>
+
+      <label for="promptInputDia" class="sr-only">Data do evento</label>
+      <input
+        type="text"
+        id="promptInputDia"
+        placeholder="Data do evento (ex: 23 a 25 de Junho)"
+        autocomplete="off"
+      />
+
+      <button id="generateBtn" type="button">
+        Gerar Cartaz
+      </button>
     </div>
 
-    <div id="sketch"></div>
+    <div id="sketch" role="img" aria-label="Cartaz gerado"></div>
 
+    <script src="cores-cidades.js"></script>
     <script src="sketch.js"></script>
-  </body>
     <script src="randomBg.js"></script>
+  </body>
 </html>

@@ -21,10 +21,16 @@ app.post("/generate-image", async (req, res) => {
         const randomSeed = Math.floor(Math.random() * 9999999);
         const encodedPrompt = encodeURIComponent(prompt);
 
-        const url = `https://image.pollinations.ai/p/${encodedPrompt}?width=512&height=512&nologo=true&enhance=true&seed=${randomSeed}`;
+        // Link corrigido de /p/ para /prompt/
+        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&enhance=true&seed=${randomSeed}`;
 
         const response = await fetch(url);
-        if (!response.ok) throw new Error("Erro ao obter imagem.");
+        
+        // Tratamento de erro melhorado
+        if (!response.ok) {
+            console.error(`Falha no Pollinations: ${response.status} - ${response.statusText}`);
+            throw new Error("Erro ao obter imagem da API.");
+        }
 
         const arrayBuffer = await response.arrayBuffer();
         const imageBlob = new Blob([arrayBuffer], { type: "image/jpeg" });

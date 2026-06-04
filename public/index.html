@@ -2,17 +2,24 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <title>Terrinhas Poster Generator</title>
-    <link rel="stylesheet" href="css.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terrinhas — Gerador de Cartazes</title>
+    <link rel="stylesheet" href="css.css" />
   </head>
-  <body id="start">
-    <h1>Gerador de Cartazes para Festas de Terrinhas</h1>
-    <p>Clica em qualquer lado para começar</p>
+  <body>
+    <!-- Entire body is the click target -->
+    <main id="start" role="button" tabindex="0" aria-label="Clica para começar a criar o teu cartaz">
+      <h1>Gerador de Cartazes para Festas da Terrinha</h1>
+      <p>Clica em qualquer lado para começar</p>
+    </main>
+
+    <script>
+      function goNext() { window.location.href = "saint-generator.html"; }
+      document.getElementById("start").addEventListener("click", goNext);
+      document.getElementById("start").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goNext(); }
+      });
+    </script>
+    <script src="randomBg.js"></script>
   </body>
-  <script lang="js">
-    document.getElementById("start").addEventListener("click", () => {
-      window.location.href = "saint-generator.html";
-    });
-  </script>
-  <script src="randomBg.js"></script>
 </html>

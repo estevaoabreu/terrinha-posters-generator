@@ -2,34 +2,41 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <title>Terrinhas Poster Generator</title>
-    <link rel="stylesheet" href="css.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Terrinhas — Escolha o Santo</title>
+    <link rel="stylesheet" href="css.css" />
   </head>
   <body>
-    <div>
+    <div class="form-wrapper">
+      <p>Escolhe o padroeiro da festa</p>
+
+      <label for="promptInputSanto" class="sr-only">Nome do Santo</label>
       <input
         type="text"
         id="promptInputSanto"
-        placeholder="Insere o nome de um São/Santo/Santa..."
+        placeholder="Nome do Santo/Santa/São..."
+        autocomplete="off"
+        spellcheck="false"
       />
-      <button id="generateBtn">Gerar Imagens</button>
+
+      <button id="generateBtn" type="button">
+        Gerar Imagens do Santo
+      </button>
+
+      <p id="status" aria-live="polite" aria-atomic="true"></p>
     </div>
 
-    <p id="status"></p>
-
-    <div id="canvas">
-      <img class="outputImage" src="" />
-      <img class="outputImage" src="" />
-      <img class="outputImage" src="" />
+    <div id="canvas" aria-label="Imagens geradas" role="region">
+      <img class="outputImage" src="" alt="Imagem 1 do santo" />
+      <img class="outputImage" src="" alt="Imagem 2 do santo" />
+      <img class="outputImage" src="" alt="Imagem 3 do santo" />
     </div>
 
-    <button
-      id="continueBtn"
-      onclick="window.location.href = 'poster-generator.html'"
-    >
-      Continuar para Geração de Cartazes
+    <button id="continueBtn" type="button" onclick="window.location.href='poster-generator.html'">
+      Continuar para Geração de Cartazes →
     </button>
+
+    <script src="script.js"></script>
+    <script src="randomBg.js"></script>
   </body>
-  <script src="script.js"></script>
-  <script src="randomBg.js"></script>
 </html>
