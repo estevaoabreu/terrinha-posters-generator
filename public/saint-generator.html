@@ -34,12 +34,10 @@
   <script src="randomBg.js"></script>
   <script lang="js">
     var c = getRandomColor();
+    document.documentElement.style.setProperty('--accent-color', c);
     document
       .querySelectorAll("button")
       .forEach((btn) => (btn.style.background = c));
     document.getElementById("promptInputSanto").style.border = "5px solid " + c;
-    document.querySelectorAll(".outputImage.selected").forEach((img) => {
-      img.style.border = "4px solid " + c;
-    });
   </script>
 </html>

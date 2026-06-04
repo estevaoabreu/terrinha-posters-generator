@@ -60,3 +60,17 @@ h1 {
     height: auto;
   }
 }
+
+.outputImage {
+  border: 4px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin: 10px;
+}
+
+.outputImage.selected {
+  border: 4px solid var(--accent-color, white);
+  box-shadow: 0 0 20px var(--accent-color, white);
+  transform: scale(1.05);
+}
