@@ -1,13 +1,21 @@
+let dynamicImagesConfig = { artistas: [], logos: [] };
+
+fetch("/api/images")
+  .then((res) => res.json())
+  .then((data) => {
+    dynamicImagesConfig = data;
+  })
+  .catch((err) => console.error("Erro ao carregar lista de imagens:", err));
+
 var sketch = function (sketch) {
   let templatesDB;
   let selectedTemplate;
-  let imagensCarregadas = [];
+  let imagensArtistas = [];
+  let logos = [];
   let saintImage;
 
   let selectedTitleFont;
   let selectedBodyFont;
-
-  let quantidadeDeImagens = 3;
 
   let paletaAtiva = null;
 
@@ -27,9 +35,12 @@ var sketch = function (sketch) {
   sketch.preload = function () {
     templatesDB = sketch.loadJSON("posicoes.json");
 
-    for (let i = 1; i <= quantidadeDeImagens; i++) {
-      let caminhoDaImagem = "ImagensArtistas/Frame " + i + ".png";
-      imagensCarregadas.push(sketch.loadImage(caminhoDaImagem));
+    for (let nome of dynamicImagesConfig.artistas) {
+      imagensArtistas.push(sketch.loadImage("artistas/" + nome));
+    }
+
+    for (let nome of dynamicImagesConfig.logos) {
+      logos.push(sketch.loadImage("logos/" + nome));
     }
 
     let storedSaintImage = localStorage.getItem("selectedSaintImage");
@@ -56,7 +67,7 @@ var sketch = function (sketch) {
       userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
     }
 
-    userData.artistas = imagensCarregadas;
+    userData.artistas = imagensArtistas;
 
     if (typeof resolverPaleta === "function") {
       paletaAtiva = resolverPaleta(inputLocalidade || null);

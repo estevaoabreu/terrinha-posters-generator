@@ -8,8 +8,25 @@ const fetch = (...args) =>
 
 const app = express();
 
+const fs = require('fs');
+const path = require('path');
+
 app.use(express.json());
 app.use(express.static("public"));
+
+app.get("/api/images", (req, res) => {
+  try {
+    const artistasDir = path.join(__dirname, "public", "artistas");
+    const logosDir = path.join(__dirname, "public", "logos");
+    
+    const artistas = fs.existsSync(artistasDir) ? fs.readdirSync(artistasDir).filter(f => !f.startsWith(".")) : [];
+    const logos = fs.existsSync(logosDir) ? fs.readdirSync(logosDir).filter(f => !f.startsWith(".")) : [];
+    
+    res.json({ artistas, logos });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.post("/generate-image", async (req, res) => {
   try {
