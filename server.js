@@ -20,6 +20,15 @@ app.post("/generate-image", async (req, res) => {
       async (_, i) => {
         const randomSeed = Math.floor(Math.random() * 9999999);
 
+        // Link corrigido de /p/ para /prompt/
+        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&enhance=true&seed=${randomSeed}`;
+
+        const response = await fetch(url);
+        
+        // Tratamento de erro melhorado
+        if (!response.ok) {
+            console.error(`Falha no Pollinations: ${response.status} - ${response.statusText}`);
+            throw new Error("Erro ao obter imagem da API.");
         const HF_API_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
         if (!HF_API_TOKEN)
           throw new Error("HUGGINGFACE_API_TOKEN not set");
