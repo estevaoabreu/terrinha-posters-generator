@@ -20,18 +20,8 @@ app.post("/generate-image", async (req, res) => {
       async (_, i) => {
         const randomSeed = Math.floor(Math.random() * 9999999);
 
-        // Link corrigido de /p/ para /prompt/
-        const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true&enhance=true&seed=${randomSeed}`;
-
-        const response = await fetch(url);
-        
-        // Tratamento de erro melhorado
-        if (!response.ok) {
-            console.error(`Falha no Pollinations: ${response.status} - ${response.statusText}`);
-            throw new Error("Erro ao obter imagem da API.");
         const HF_API_TOKEN = process.env.HUGGINGFACE_API_TOKEN;
-        if (!HF_API_TOKEN)
-          throw new Error("HUGGINGFACE_API_TOKEN not set");
+        if (!HF_API_TOKEN) throw new Error("HUGGINGFACE_API_TOKEN not set");
 
         const hfUrl =
           "https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell";
@@ -55,13 +45,18 @@ app.post("/generate-image", async (req, res) => {
             body: JSON.stringify(body),
           });
         } catch (err) {
-          console.error("Network error calling Hugging Face API:", err.message || err);
+          console.error(
+            "Network error calling Hugging Face API:",
+            err.message || err,
+          );
           return placeholderBase64;
         }
 
         let retries = 5;
         while (!response.ok && retries > 0) {
-          console.log(`Hugging Face API busy/loading (status ${response.status}). Retrying in 5s...`);
+          console.log(
+            `Hugging Face API busy/loading (status ${response.status}). Retrying in 5s...`,
+          );
           await new Promise((r) => setTimeout(r, 5000));
           response = await fetch(hfUrl, {
             method: "POST",
@@ -85,7 +80,9 @@ app.post("/generate-image", async (req, res) => {
         if (contentType.includes("application/json")) {
           const json = await response.json();
           if (json.error) throw new Error(`Hugging Face error: ${json.error}`);
-          throw new Error("Unexpected JSON response from Hugging Face Inference API");
+          throw new Error(
+            "Unexpected JSON response from Hugging Face Inference API",
+          );
         }
 
         const arrayBuffer = await response.arrayBuffer();

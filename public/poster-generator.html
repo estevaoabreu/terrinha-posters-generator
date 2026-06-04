@@ -9,44 +9,29 @@
     <script src="/p5.min.js"></script>
   </head>
   <body>
-    <div class="form-wrapper">
-      <p>Insere as informações sobre a festa</p>
+    <h2>Insere as informações sobre a festa</h2>
+    <input type="text" id="promptInputLocalidade" placeholder="Nome da festa" />
 
-      <label for="promptInputLocalidade" class="sr-only">Nome da localidade / festa</label>
-      <input
-        type="text"
-        id="promptInputLocalidade"
-        placeholder="Nome da localidade / festa"
-        autocomplete="off"
-      />
+    <textarea
+      id="promptPrograma"
+      placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"
+    ></textarea>
 
-      <label for="promptPrograma" class="sr-only">Programa da festa</label>
-      <textarea
-        id="promptPrograma"
-        placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"
-      ></textarea>
+    <input
+      type="number"
+      id="promptNúmeroLogos"
+      placeholder="Nº de logos de patrocinadores"
+      min="0"
+      step="1"
+    />
 
-      <label for="promptNúmeroLogos" class="sr-only">Número de logos de patrocinadores</label>
-      <input
-        type="number"
-        id="promptNúmeroLogos"
-        placeholder="Nº de logos de patrocinadores"
-        min="0"
-        step="1"
-      />
+    <input
+      type="text"
+      id="promptInputDia"
+      placeholder="Data do evento (ex: 23 a 25 de Junho)"
+    />
 
-      <label for="promptInputDia" class="sr-only">Data do evento</label>
-      <input
-        type="text"
-        id="promptInputDia"
-        placeholder="Data do evento (ex: 23 a 25 de Junho)"
-        autocomplete="off"
-      />
-
-      <button id="generateBtn" type="button">
-        Gerar Cartaz
-      </button>
-    </div>
+    <button id="generateBtn" type="button">Gerar Cartaz</button>
 
     <div id="sketch" role="img" aria-label="Cartaz gerado"></div>
 

@@ -7,43 +7,38 @@
     <link rel="stylesheet" href="css.css" />
   </head>
   <body>
-    <div class="form-wrapper">
-      <p>Escolhe o padroeiro da festa</p>
+    <h2>Escolhe o padroeiro da festa!</h2>
 
-      <label for="promptInputSanto" class="sr-only">Nome do Santo</label>
+    <div>
       <input
         type="text"
         id="promptInputSanto"
-        placeholder="Nome do Santo/Santa/São..."
-        autocomplete="off"
-        spellcheck="false"
+        placeholder="Insere o nome de um São/Santo/Santa..."
       />
-
-      <button id="generateBtn" type="button">
-        Gerar Imagens do Santo
-      </button>
-
-      <p id="status" aria-live="polite" aria-atomic="true"></p>
+      <button id="generateBtn">Gerar Imagens</button>
     </div>
 
-    <div id="canvas" aria-label="Imagens geradas" role="region">
-      <img class="outputImage" src="" alt="Imagem 1 do santo" />
-      <img class="outputImage" src="" alt="Imagem 2 do santo" />
-      <img class="outputImage" src="" alt="Imagem 3 do santo" />
+    <p id="status"></p>
+
+    <div id="canvas">
+      <img class="outputImage" />
+      <img class="outputImage" />
+      <img class="outputImage" />
     </div>
 
-    <button id="continueBtn" type="button" onclick="window.location.href='poster-generator.html'">
-      Continuar para Geração de Cartazes →
+    <button
+      id="continueBtn"
+      type="button"
+      onclick="window.location.href = 'poster-generator.html'"
+    >
+      Continuar para Geração de Cartazes =>
     </button>
-
-    <script src="script.js"></script>
-    <script src="randomBg.js"></script>
   </body>
   <script src="script.js"></script>
   <script src="randomBg.js"></script>
   <script lang="js">
     var c = getRandomColor();
-    document.documentElement.style.setProperty('--accent-color', c);
+    document.documentElement.style.setProperty("--accent-color", c);
     document
       .querySelectorAll("button")
       .forEach((btn) => (btn.style.background = c));

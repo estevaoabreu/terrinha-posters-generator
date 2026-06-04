@@ -6,18 +6,13 @@
     <title>Terrinhas — Gerador de Cartazes</title>
     <link rel="stylesheet" href="css.css" />
   </head>
-  <body>
-    <!-- Entire body is the click target -->
-    <main id="start" role="button" tabindex="0" aria-label="Clica para começar a criar o teu cartaz">
-      <h1>Gerador de Cartazes para Festas da Terrinha</h1>
-      <p>Clica em qualquer lado para começar</p>
-    </main>
+  <body id="start">
+    <h1>Gerador de Cartazes para Festas da Terrinha</h1>
+    <p>Clica em qualquer lado para começar</p>
 
     <script>
-      function goNext() { window.location.href = "saint-generator.html"; }
-      document.getElementById("start").addEventListener("click", goNext);
-      document.getElementById("start").addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goNext(); }
+      document.getElementById("start").addEventListener("click", function () {
+        window.location.href = "saint-generator.html";
       });
     </script>
     <script src="randomBg.js"></script>

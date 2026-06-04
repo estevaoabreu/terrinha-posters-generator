@@ -1,8 +1,3 @@
-// ============================================================
-// sketch.js — Motor Generativo p5.js
-// Integra paleta cultural via window._paletaAtiva (resolverPaleta)
-// ============================================================
-
 var sketch = function (sketch) {
   let templatesDB;
   let selectedTemplate;
@@ -12,10 +7,8 @@ var sketch = function (sketch) {
   let selectedTitleFont;
   let selectedBodyFont;
 
-  // Quantidade de imagens "Frame X" na pasta
   let quantidadeDeImagens = 3;
 
-  // Paleta resolvida — preenchida em setup() após randomBg.js correr
   let paletaAtiva = null;
 
   let userData = {
@@ -31,7 +24,6 @@ var sketch = function (sketch) {
     artistas: [],
   };
 
-  // ── PRELOAD ──────────────────────────────────────────────
   sketch.preload = function () {
     templatesDB = sketch.loadJSON("posicoes.json");
 
@@ -46,84 +38,81 @@ var sketch = function (sketch) {
     }
   };
 
-  // ── SETUP ────────────────────────────────────────────────
   sketch.setup = function () {
     sketch.createCanvas(600, 850);
 
-    // ── Ler inputs do formulário ──────────────────────────
-    let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+    let inputLocalidade = document
+      .getElementById("promptInputLocalidade")
+      ?.value?.trim();
     if (inputLocalidade) userData.nomeTerrinha = inputLocalidade;
 
     let inputDia = document.getElementById("promptInputDia")?.value?.trim();
     if (inputDia) userData.dataEvento = inputDia;
 
-    let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
+    let inputPrograma = document
+      .getElementById("promptPrograma")
+      ?.value?.trim();
     if (inputPrograma) {
       userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
     }
 
     userData.artistas = imagensCarregadas;
 
-    // ── Resolver paleta cultural ──────────────────────────
-    // resolverPaleta() está disponível via randomBg.js
-    // window._paletaAtiva já foi definido em randomBg.js init,
-    // mas aqui forçamos a re-resolução com o nome real da cidade.
     if (typeof resolverPaleta === "function") {
       paletaAtiva = resolverPaleta(inputLocalidade || null);
-      // Actualizar também o fundo da página com a cidade correta
       if (typeof aplicarGradienteFundo === "function") {
         aplicarGradienteFundo(inputLocalidade || null);
       }
     } else {
-      // Fallback de segurança se randomBg.js ainda não carregou
       paletaAtiva = {
         gradient: ["#140028", "#2E0052"],
-        text:     ["#FFD700", "#FFFFFF"]
+        text: ["#FFD700", "#FFFFFF"],
       };
     }
 
-    // ── Seleccionar template e fontes ────────────────────
     let templatesArray = Object.values(templatesDB);
     let randomIndex = sketch.floor(sketch.random(templatesArray.length));
     selectedTemplate = templatesArray[randomIndex].annotations[0].result;
 
     selectedTitleFont = sketch.random(titleFonts);
-    selectedBodyFont  = sketch.random(bodyFonts);
+    selectedBodyFont = sketch.random(bodyFonts);
 
     sketch.noLoop();
 
     if (document.fonts) {
-      document.fonts.ready.then(() => { sketch.redraw(); });
+      document.fonts.ready.then(() => {
+        sketch.redraw();
+      });
     }
   };
 
-  // ── DRAW ─────────────────────────────────────────────────
   sketch.draw = function () {
-    // Fundo baseado na paleta cultural
     const [bgA, bgB] = paletaAtiva.gradient;
     _drawGradientBackground(bgA, bgB);
 
-    let indiceArtista    = 0;
+    let indiceArtista = 0;
     let indiceProgramacao = 0;
 
     for (let box of selectedTemplate) {
       let rawLabel = box.value.rectanglelabels[0];
-      let label    = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+      let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
 
-      let px     = sketch.map(box.value.x,      0, 100, 0, sketch.width);
-      let py     = sketch.map(box.value.y,      0, 100, 0, sketch.height);
-      let pWidth = sketch.map(box.value.width,  0, 100, 0, sketch.width);
-      let pHeight= sketch.map(box.value.height, 0, 100, 0, sketch.height);
+      let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
+      let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
+      let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
+      let pHeight = sketch.map(box.value.height, 0, 100, 0, sketch.height);
 
       let conteudoDinamico = "";
 
       if (label.includes("Artista (Imagem)")) {
         if (userData.artistas.length > 0) {
-          conteudoDinamico = userData.artistas[indiceArtista % userData.artistas.length];
+          conteudoDinamico =
+            userData.artistas[indiceArtista % userData.artistas.length];
         }
         indiceArtista++;
       } else if (label.includes("Programação")) {
-        conteudoDinamico = userData.programacao[indiceProgramacao % userData.programacao.length];
+        conteudoDinamico =
+          userData.programacao[indiceProgramacao % userData.programacao.length];
         indiceProgramacao++;
       }
 
@@ -131,15 +120,7 @@ var sketch = function (sketch) {
     }
   };
 
-  // ── GRADIENT BACKGROUND HELPER ───────────────────────────
-  /**
-   * Desenha um gradiente vertical simples no canvas p5.
-   * Aceita strings CSS "hsl(...)" ou "#HEX".
-   */
   function _drawGradientBackground(corA, corB) {
-    // Converter string CSS → cor p5
-    // p5 não lê "hsl()" directamente; criamos um elemento DOM auxiliar
-    // para extrair RGB via computed style.
     const toRGB = (cssColor) => {
       const el = document.createElement("div");
       el.style.color = cssColor;
@@ -165,7 +146,6 @@ var sketch = function (sketch) {
     sketch.noStroke();
   }
 
-  // ── RENDERIZAR CAIXAS ────────────────────────────────────
   function renderContent(label, x, y, w, h, conteudoDinamico) {
     sketch.noStroke();
     sketch.textFont(`"${selectedBodyFont}"`);
@@ -176,28 +156,23 @@ var sketch = function (sketch) {
       if (saintImage) {
         sketch.image(saintImage, x, y, w, h);
       }
-
     } else if (label.includes("Nome da Terrinha")) {
       sketch.fill(corTitulo);
       sketch.textFont(`"${selectedTitleFont}"`);
       drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.NORMAL);
-
     } else if (label.includes("Data do Evento")) {
       sketch.fill(corData);
       drawTextFitted(userData.dataEvento, x, y, w, h, sketch.BOLD);
-
     } else if (label.includes("Local")) {
       sketch.fill(220, 220, 220);
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
       sketch.textSize(16);
       sketch.text("Local: " + userData.local, x, y, w, h);
-
     } else if (label.includes("Programação")) {
       sketch.fill(255);
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
       sketch.textSize(16);
       sketch.text(conteudoDinamico, x, y, w, h);
-
     } else if (label.includes("Artista (Imagem)")) {
       if (conteudoDinamico) {
         sketch.image(conteudoDinamico, x, y, w, h);
@@ -208,7 +183,6 @@ var sketch = function (sketch) {
         sketch.textAlign(sketch.CENTER, sketch.CENTER);
         sketch.text("Falta Foto!", x + w / 2, y + h / 2);
       }
-
     } else if (label.includes("Patrocínios")) {
       sketch.fill(255);
       sketch.rect(x, y, w, h);
@@ -219,7 +193,6 @@ var sketch = function (sketch) {
     }
   }
 
-  // ── TEXTO AJUSTADO SEM DISTORÇÃO ─────────────────────────
   function drawTextFitted(txt, x, y, w, h, style) {
     sketch.push();
     sketch.translate(x + w / 2, y + h / 2);
@@ -241,7 +214,6 @@ var sketch = function (sketch) {
   }
 };
 
-// ── TRIGGER ──────────────────────────────────────────────────
 document.getElementById("generateBtn").addEventListener("click", () => {
   document.getElementById("sketch").innerHTML = "";
   let posterSketch = new p5(sketch, "sketch");
