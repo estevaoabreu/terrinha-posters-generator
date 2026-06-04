@@ -1,84 +1,167 @@
+/* * TERRINHAS — GERADOR DE CARTAZES 
+ * Estética: Web 1.0 / GeoCities / Tasca Portuguesa
+ */
+
 html {
-  font-family: "Comic Sans MS", sans-serif;
+  font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
+  /* Portugal Flag Orb - https://www.cursors-4u.com/cursor/portugal-flag-orb */
+* {
+  cursor: url('https://cdn.cursors-4u.net/previews/portugal-flag-orb-4b1c7fa4-32.webp') 32 32, auto !important;
+}
 }
 
 body {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  /* Fundo de toalha de tasca (padrão quadriculado) em vez de cor sólida */
+  background-image: url('https://www.transparenttextures.com/patterns/red-squared.png');
+  background-color: #ffcccc;
+  
+  /* Retiramos o Flexbox perfeito e deixamos o layout ao centro, mais natural para a época */
   text-align: center;
-  padding: 0;
+  padding: 20px;
   margin: 0;
   border: 0;
 }
 
-p,
-h1,
-h2 {
-  color: #ffffff;
+/* =========================================
+   TIPOGRAFIA (Efeito WordArt & Neon)
+   ========================================= */
+
+p {
+  color: lime;
+  background-color: black;
+  font-weight: bold;
+  padding: 10px;
+  display: inline-block;
+  border: 2px solid white;
+}
+
+h1 {
+  font-family: "Lobster", cursive, "Comic Sans MS";
+  font-size: 4.5em;
+  color: #ffff00; /* Amarelo chocante */
+  /* Sombras múltiplas para criar um contorno 3D falso */
+  text-shadow: 
+    3px 3px 0px #ff0000, 
+    6px 6px 0px #0000ff,
+    -2px -2px 0px #000000;
+  line-height: 1.1;
+  margin-top: 0.5em;
+  margin-bottom: 0.2em;
+}
+
+#start h1 {
+  font-size: 5.5em;
+  width: 90%;
+  margin: 0 auto;
 }
 
 h2 {
-  font-size: 1.5em;
-  margin: 0;
-  margin-top: 1.5em;
+  font-size: 2em;
+  color: #00ff00; /* Verde néon */
+  background-color: #0000ff; /* Fundo azul para contraste brutal */
+  padding: 10px 20px;
+  border: 4px dashed #ffff00; /* Borda a tracejado */
+  display: inline-block;
+  margin-top: 1em;
   margin-bottom: 1em;
 }
 
-#start {
-  h1 {
-    width: 60%;
-    font-size: 5em;
-    margin-top: -0.5em;
-  }
+/* =========================================
+   FORMULÁRIOS (Inputs & Textarea)
+   ========================================= */
+
+input, textarea {
+  font-family: "Comic Sans MS", sans-serif;
+  font-size: 1.2em;
+  padding: 10px;
+  width: 320px;
+  max-width: 90%;
+  
+  /* Cores de formulário antigo */
+  background-color: #ffffcc; /* Fundo amarelado (papel) */
+  color: #0000ff; /* Azul link clássico */
+  
+  /* Borda 3D "afundada" clássica do Windows */
+  border: 4px inset #cccccc; 
+  font-weight: bold;
+  margin: 10px;
 }
 
-input {
-  padding: 10px;
-  width: 300px;
-  font-family: "Comic Sans MS", sans-serif;
+textarea {
+  height: 100px;
+  resize: none; 
+  vertical-align: top;
 }
+
+/* =========================================
+   BOTÕES (Estilo Tijolo / Plástico)
+   ========================================= */
 
 button {
   font-family: "Comic Sans MS", sans-serif;
-  padding: 10px 20px;
-  cursor: pointer;
-  color: white;
-  border: 5px solid white;
-  margin-top: 4em;
-  margin-bottom: 4em;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 15px 25px;
+  cursor: url('https://cur.cursors-4u.net/food/foo-1/foo14.cur'), pointer;
+  
+  /* Cores berrantes de festa */
+  background-color: #ff00ff; 
+  color: #ffff00;
+  
+  /* Borda "outset" clássica (dá o aspeto 3D saliente) */
+  border: 6px outset #ff66ff; 
+  margin-top: 1em;
+  margin-bottom: 1em;
+  text-transform: uppercase;
+}
+
+/* Sem transições suaves! O efeito tem de ser imediato */
+button:active {
+  /* Efeito físico ao clicar: a borda afunda */
+  border-style: inset;
+  background-color: #cc00cc;
 }
 
 #generateBtn {
   margin-top: 1.5em;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-h1 {
-  font-family: "Lobster";
+#continueBtn {
+  background-color: #0000ff;
+  border-color: #3333ff;
+  color: #ffffff;
 }
+
+#continueBtn:active {
+  background-color: #0000cc;
+}
+
+/* =========================================
+   ÁREA DE GERAÇÃO (CANVAS & IMAGENS)
+   ========================================= */
 
 #canvas {
-  flex-grow: 1;
   width: 90%;
+  margin: 20px auto;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-
-  img {
-    width: 27%;
-    height: auto;
-  }
+  flex-wrap: wrap;
+  gap: 15px;
 }
 
 .outputImage {
-  border: 4px solid transparent;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  margin: 10px;
+  width: 27%;
+  min-width: 150px;
+  height: auto;
+  
+  /* Borda de moldura foleira e dura */
+  border: 6px ridge #aaaaaa; 
+  cursor: url('https://cur.cursors-4u.net/food/foo-1/foo14.cur'), pointer;
   display: none;
 }
 
@@ -86,8 +169,23 @@ h1 {
   display: block;
 }
 
+/* Estado da imagem quando é selecionada pelo utilizador */
 .outputImage.selected {
-  border: 4px solid var(--accent-color, white);
-  box-shadow: 0 0 20px var(--accent-color, white);
-  transform: scale(1.05);
+  /* Substituímos o 'box-shadow' suave por uma borda pontilhada agressiva */
+  border: 6px dashed #00ff00;
+  background-color: #ff00ff;
+  transform: scale(1.05); /* Mantemos o scale para feedback visual, mas sem animação */
+}
+
+/* =========================================
+   TEXTOS DE STATUS (Carregamento, etc)
+   ========================================= */
+
+#status {
+  background: none;
+  border: none;
+  color: #ff0000;
+  background-color: yellow;
+  font-size: 1.2em;
+  margin-top: 0;
 }
