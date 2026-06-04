@@ -3,9 +3,10 @@
  */
 
 :root {
-  /* Removemos a pasta 'cursor/' do caminho se o servidor 
-     estiver a servir o conteúdo da pasta 'public' como raiz */
   --cursor-frame: url('/cursor/cursor1.png') 0 0, auto;
+  --amarelo-festa: #ffff00;
+  --azul-festa: #0000ff;
+  --rosa-festa: #ff00ff;
 }
 
 html {
@@ -16,83 +17,63 @@ html {
 body {
   background-image: url('https://www.transparenttextures.com/patterns/red-squared.png');
   background-color: #ffcccc;
-  text-align: center;
-  padding: 20px;
   margin: 0;
-  border: 0;
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
 }
 
-/* =========================================
-   TIPOGRAFIA
-   ========================================= */
-
-p {
-  color: lime;
-  background-color: black;
-  font-weight: bold;
-  padding: 10px;
-  display: inline-block;
-  border: 2px solid white;
+#container {
+  max-width: 800px;
+  width: 95%;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  border: 5px solid #1a1a24;
+  text-align: center;
+  box-shadow: 10px 10px 0px rgba(0,0,0,0.2);
 }
 
+/* TIPOGRAFIA */
 h1 {
   font-family: "Lobster", cursive, "Comic Sans MS";
-  font-size: 4.5em;
-  color: #ffff00; 
-  text-shadow: 
-    3px 3px 0px #ff0000, 
-    6px 6px 0px #0000ff,
-    -2px -2px 0px #000000;
-  line-height: 1.1;
-  margin-top: 0.5em;
-  margin-bottom: 0.2em;
-}
-
-#start h1 {
-  font-size: 5.5em;
-  width: 90%;
-  margin: 0 auto;
+  font-size: 4em;
+  color: var(--amarelo-festa);
+  text-shadow: 3px 3px 0px #ff0000, 6px 6px 0px #0000ff, -2px -2px 0px #000000;
+  margin-bottom: 0.5em;
 }
 
 h2 {
-  font-size: 2em;
-  color: #00ff00; 
-  background-color: #0000ff; 
+  font-size: 1.8em;
+  color: #00ff00;
+  background-color: var(--azul-festa);
   padding: 10px 20px;
-  border: 4px dashed #ffff00; 
+  border: 4px dashed var(--amarelo-festa);
   display: inline-block;
-  margin-top: 1em;
   margin-bottom: 1em;
 }
 
-/* =========================================
-   FORMULÁRIOS
-   ========================================= */
-
+/* FORMULÁRIOS */
 input, textarea {
-  font-family: "Comic Sans MS", sans-serif;
-  font-size: 1.2em;
-  padding: 10px;
-  width: 320px;
+  display: block;
+  margin: 15px auto;
+  padding: 12px;
+  width: 350px;
   max-width: 90%;
-  background-color: #ffffcc; 
-  color: #0000ff; 
-  border: 4px inset #cccccc; 
+  background-color: #ffffcc;
+  color: #0000ff;
+  border: 4px inset #cccccc;
   font-weight: bold;
-  margin: 10px;
 }
 
 textarea {
   height: 100px;
-  resize: none; 
-  vertical-align: top;
+  resize: none;
 }
 
-/* =========================================
-   BOTÕES
-   ========================================= */
-
-button {
+/* BOTÕES */
+button, .botao-entrar {
   font-family: inherit;
   font-size: 1.2rem;
   font-weight: bold;
@@ -105,6 +86,8 @@ button {
   box-shadow: 5px 5px 0px #1a1a24;
   margin: 1.5em;
   text-transform: uppercase;
+  display: inline-block;
+  text-decoration: none;
 }
 
 button:active {
@@ -113,65 +96,9 @@ button:active {
   background-color: #ff9900;
 }
 
-#generateBtn {
-  margin-top: 1.5em;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-#continueBtn {
-  background-color: #0000ff;
-  border-color: #3333ff;
-  color: #ffffff;
-}
-
-#continueBtn:active {
-  background-color: #0000cc;
-}
-
-/* =========================================
-   ÁREA DE GERAÇÃO
-   ========================================= */
-
-#canvas {
-  width: 90%;
-  margin: 20px auto;
+/* ÁREA DE GERAÇÃO */
+#sketch {
+  margin-top: 30px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 15px;
-}
-
-.outputImage {
-  width: 28%;
-  min-width: 200px;
-  height: auto;
-  background-color: #ffffff;
-  padding: 8px;
-  border: 3px solid #1a1a24;
-  box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
-  cursor: var(--cursor-frame) !important;
-  display: none;
-}
-
-.outputImage[src]:not([src=""]) {
-  display: block;
-}
-
-.outputImage.selected {
-  border: 6px dashed #00ff00;
-  background-color: #ff00ff;
-  transform: scale(1.05);
-}
-
-#status {
-  background: none;
-  border: none;
-  color: #ff0000;
-  background-color: yellow;
-  font-size: 1.2em;
-  margin-top: 0;
 }

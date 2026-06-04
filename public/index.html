@@ -6,35 +6,31 @@
     <title>Terrinhas — Gerador de Cartazes</title>
     <link rel="stylesheet" href="css.css" />
   </head>
-  <body id="start">
-  <marquee scrollamount="15" style="background: red; color: yellow; font-family: 'Comic Sans MS'; font-size: 24px; font-weight: bold; padding: 10px; border-bottom: 5px solid white;">
-    🎇 HÁ BIFANAS! 🎇 CERVEJA A 1€! 🎇 MUSICA BOA E MUITO MAIS! 🎇 TUDO A SALTAR! 🎇
-  </marquee>
+  <body>
+    <div id="container">
+      <marquee scrollamount="15" style="background: red; color: yellow; font-family: 'Comic Sans MS'; font-size: 24px; font-weight: bold; padding: 10px; border-bottom: 5px solid white; margin-bottom: 20px;">
+        🎇 HÁ BIFANAS! 🎇 CERVEJA A 1€! 🎇 MUSICA BOA E MUITO MAIS! 🎇 TUDO A SALTAR! 🎇
+      </marquee>
 
-  <h1>Gerador de Cartazes <br> para Festas da Terrinha</h1>
-  
-  <p style="background: black; color: lime; font-weight: bold; padding: 5px;">
-    Pisca o olho à comissão de festas e <blink>clica no chouriço</blink> para começar!
-  </p>
+      <h1>Gerador de Cartazes <br> para Festas da Terrinha</h1>
+      
+      <p style="background: black; color: lime; font-weight: bold; padding: 10px; border: 2px solid white;">
+        Pisca o olho à comissão de festas e clica no botão para começar!
+      </p>
 
-  <a href="saint-generator.html">
-    <img src="https://i.gifer.com/origin/d8/d8e35799e4f0baad6cd903ebc361405e_w200.gif" alt="Entrar" style="border: 5px ridge gold; width: 200px;">
-  </a>
-  
-  <br><br>
-  <img src="https://www.free-website-hit-counter.com/c.php?d=9&id=103681&s=16" alt="Hit counter" title="Hit counter">
+      <a href="saint-generator.html" class="botao-entrar">
+        ENTRAR NA FESTA
+      </a>
+    </div>
 
-  <script src="randomBg.js"></script>
+    <script src="randomBg.js"></script>
 
-  <script>
-  let frame = 1;
-  const totalFrames = 4;
-
-  setInterval(() => {
-    // Tenta isto: remover o ponto inicial se a pasta 'cursor' está na raiz do servidor
-    document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
-    frame = frame >= totalFrames ? 1 : frame + 1;
-  }, 200); 
-</script>
-</body>
+    <script>
+      let frame = 1;
+      setInterval(() => {
+        document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+        frame = frame >= 4 ? 1 : frame + 1;
+      }, 200);
+    </script>
+  </body>
 </html>

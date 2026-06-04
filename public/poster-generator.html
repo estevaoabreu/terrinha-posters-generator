@@ -6,47 +6,31 @@
     <title>Terrinhas — Gerador de Cartaz</title>
     <link rel="stylesheet" href="css.css" />
     <script src="fonts.js" defer></script>
-    <script src="/p5.min.js"></script>
+    <script src="p5.min.js"></script>
   </head>
   <body>
-    <h2>Insere as informações sobre a festa</h2>
-    <input type="text" id="promptInputLocalidade" placeholder="Nome da festa" />
+    <div id="container">
+      <h1>Gerador de Cartaz</h1>
+      <h2>Insere as informações</h2>
 
-    <textarea
-      id="promptPrograma"
-      placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"
-    ></textarea>
+      <input type="text" id="promptInputLocalidade" placeholder="Nome da festa" />
+      <textarea id="promptPrograma" placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"></textarea>
+      <input type="number" id="promptNúmeroLogos" placeholder="Nº de logos" min="0" step="1" />
+      <input type="text" id="promptInputDia" placeholder="Data (ex: 23 a 25 Junho)" />
 
-    <input
-      type="number"
-      id="promptNúmeroLogos"
-      placeholder="Nº de logos de patrocinadores"
-      min="0"
-      step="1"
-    />
+      <button id="generateBtn" type="button">Gerar Cartaz</button>
 
-    <input
-      type="text"
-      id="promptInputDia"
-      placeholder="Data do evento (ex: 23 a 25 de Junho)"
-    />
-
-    <button id="generateBtn" type="button">Gerar Cartaz</button>
-
-    <div id="sketch" role="img" aria-label="Cartaz gerado"></div>
+      <div id="sketch"></div>
+    </div>
 
     <script src="cores-cidades.js"></script>
     <script src="sketch.js"></script>
-
     <script>
-  let frame = 1;
-  const totalFrames = 4;
-
-  setInterval(() => {
-    // Tenta isto: remover o ponto inicial se a pasta 'cursor' está na raiz do servidor
-    document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
-    frame = frame >= totalFrames ? 1 : frame + 1;
-  }, 200); 
-</script>
+      let frame = 1;
+      setInterval(() => {
+        document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+        frame = frame >= 4 ? 1 : frame + 1;
+      }, 200);
+    </script>
   </body>
 </html>

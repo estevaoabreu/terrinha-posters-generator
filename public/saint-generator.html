@@ -7,45 +7,41 @@
     <link rel="stylesheet" href="css.css" />
   </head>
   <body>
-    <h2>Escolhe o padroeiro da festa!</h2>
+    <div id="container">
+      
+      <h2>Escolhe o padroeiro da festa!</h2>
 
-    <div>
-      <input
-        type="text"
-        id="promptInputSanto"
-        placeholder="Insere o nome de um São/Santo/Santa..."
-      />
-      <button id="generateBtn">Gerar Imagens</button>
+      <div class="input-group">
+        <input
+          type="text"
+          id="promptInputSanto"
+          placeholder="Insere o nome de um São/Santo/Santa..."
+        />
+        <button id="generateBtn">Gerar Imagens</button>
+      </div>
+
+      <p id="status"></p>
+
+      <div id="canvas">
+        <img class="outputImage" id="img1" />
+        <img class="outputImage" id="img2" />
+        <img class="outputImage" id="img3" />
+      </div>
+
+      <a href="poster-generator.html" class="botao-entrar" style="margin-top: 30px;">
+        Continuar para Cartazes =>
+      </a>
+      
     </div>
-
-    <p id="status"></p>
-
-    <div id="canvas">
-      <img class="outputImage" />
-      <img class="outputImage" />
-      <img class="outputImage" />
-    </div>
-
-    <button
-      id="continueBtn"
-      type="button"
-      onclick="window.location.href = 'poster-generator.html'"
-    >
-      Continuar para Geração de Cartazes =>
-    </button>
 
     <script src="script.js"></script>
     <script src="randomBg.js"></script>
-
-   <script>
-  let frame = 1;
-  const totalFrames = 4;
-
-  setInterval(() => {
-    // Tenta isto: remover o ponto inicial se a pasta 'cursor' está na raiz do servidor
-    document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
-    frame = frame >= totalFrames ? 1 : frame + 1;
-  }, 200); 
-</script>
+    <script>
+      let frame = 1;
+      setInterval(() => {
+        document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+        frame = frame >= 4 ? 1 : frame + 1;
+      }, 200);
+    </script>
   </body>
 </html>
