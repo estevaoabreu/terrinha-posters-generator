@@ -33,10 +33,6 @@ var sketch = function (sketch) {
   sketch.preload = function () {
     templatesDB = sketch.loadJSON("posicoes.json");
 
-    // DICA: Se quiseres uma fonte super parecida com cartazes reais,
-    // faz upload de uma fonte (ex: impact.ttf) e descomenta a linha abaixo:
-    // minhaFonte = sketch.loadFont('impact.ttf');
-
     for (let i = 1; i <= quantidadeDeImagens; i++) {
       let caminhoDaImagem = "ImagensArtistas/Frame " + i + ".png"; // muda para .jpg se necessário
       imagensCarregadas.push(sketch.loadImage(caminhoDaImagem));
