@@ -2,20 +2,20 @@
  * Estética: Web 1.0 / GeoCities / Tasca Portuguesa
  */
 
+:root {
+  /* Removemos a pasta 'cursor/' do caminho se o servidor 
+     estiver a servir o conteúdo da pasta 'public' como raiz */
+  --cursor-frame: url('/cursor/cursor1.png') 0 0, auto;
+}
+
 html {
   font-family: "Comic Sans MS", "Comic Sans", cursive, sans-serif;
-  /* Portugal Flag Orb - https://www.cursors-4u.com/cursor/portugal-flag-orb */
-* {
-  cursor: url('https://cdn.cursors-4u.net/previews/portugal-flag-orb-4b1c7fa4-32.webp') 32 32, auto !important;
-}
+  cursor: var(--cursor-frame) !important;
 }
 
 body {
-  /* Fundo de toalha de tasca (padrão quadriculado) em vez de cor sólida */
   background-image: url('https://www.transparenttextures.com/patterns/red-squared.png');
   background-color: #ffcccc;
-  
-  /* Retiramos o Flexbox perfeito e deixamos o layout ao centro, mais natural para a época */
   text-align: center;
   padding: 20px;
   margin: 0;
@@ -23,7 +23,7 @@ body {
 }
 
 /* =========================================
-   TIPOGRAFIA (Efeito WordArt & Neon)
+   TIPOGRAFIA
    ========================================= */
 
 p {
@@ -38,8 +38,7 @@ p {
 h1 {
   font-family: "Lobster", cursive, "Comic Sans MS";
   font-size: 4.5em;
-  color: #ffff00; /* Amarelo chocante */
-  /* Sombras múltiplas para criar um contorno 3D falso */
+  color: #ffff00; 
   text-shadow: 
     3px 3px 0px #ff0000, 
     6px 6px 0px #0000ff,
@@ -57,17 +56,17 @@ h1 {
 
 h2 {
   font-size: 2em;
-  color: #00ff00; /* Verde néon */
-  background-color: #0000ff; /* Fundo azul para contraste brutal */
+  color: #00ff00; 
+  background-color: #0000ff; 
   padding: 10px 20px;
-  border: 4px dashed #ffff00; /* Borda a tracejado */
+  border: 4px dashed #ffff00; 
   display: inline-block;
   margin-top: 1em;
   margin-bottom: 1em;
 }
 
 /* =========================================
-   FORMULÁRIOS (Inputs & Textarea)
+   FORMULÁRIOS
    ========================================= */
 
 input, textarea {
@@ -76,12 +75,8 @@ input, textarea {
   padding: 10px;
   width: 320px;
   max-width: 90%;
-  
-  /* Cores de formulário antigo */
-  background-color: #ffffcc; /* Fundo amarelado (papel) */
-  color: #0000ff; /* Azul link clássico */
-  
-  /* Borda 3D "afundada" clássica do Windows */
+  background-color: #ffffcc; 
+  color: #0000ff; 
   border: 4px inset #cccccc; 
   font-weight: bold;
   margin: 10px;
@@ -94,32 +89,28 @@ textarea {
 }
 
 /* =========================================
-   BOTÕES (Estilo Tijolo / Plástico)
+   BOTÕES
    ========================================= */
 
 button {
-  font-family: "Comic Sans MS", sans-serif;
-  font-size: 1.2em;
+  font-family: inherit;
+  font-size: 1.2rem;
   font-weight: bold;
-  padding: 15px 25px;
-  cursor: url('https://cur.cursors-4u.net/food/foo-1/foo14.cur'), pointer;
-  
-  /* Cores berrantes de festa */
-  background-color: #ff00ff; 
-  color: #ffff00;
-  
-  /* Borda "outset" clássica (dá o aspeto 3D saliente) */
-  border: 6px outset #ff66ff; 
-  margin-top: 1em;
-  margin-bottom: 1em;
+  padding: 15px 30px;
+  cursor: var(--cursor-frame) !important;
+  background-color: #ffcc00;
+  color: #1a1a24;
+  border: 3px solid #1a1a24;
+  border-radius: 6px;
+  box-shadow: 5px 5px 0px #1a1a24;
+  margin: 1.5em;
   text-transform: uppercase;
 }
 
-/* Sem transições suaves! O efeito tem de ser imediato */
 button:active {
-  /* Efeito físico ao clicar: a borda afunda */
-  border-style: inset;
-  background-color: #cc00cc;
+  transform: translate(5px, 5px);
+  box-shadow: 0px 0px 0px #1a1a24;
+  background-color: #ff9900;
 }
 
 #generateBtn {
@@ -140,7 +131,7 @@ button:active {
 }
 
 /* =========================================
-   ÁREA DE GERAÇÃO (CANVAS & IMAGENS)
+   ÁREA DE GERAÇÃO
    ========================================= */
 
 #canvas {
@@ -155,13 +146,14 @@ button:active {
 }
 
 .outputImage {
-  width: 27%;
-  min-width: 150px;
+  width: 28%;
+  min-width: 200px;
   height: auto;
-  
-  /* Borda de moldura foleira e dura */
-  border: 6px ridge #aaaaaa; 
-  cursor: url('https://cur.cursors-4u.net/food/foo-1/foo14.cur'), pointer;
+  background-color: #ffffff;
+  padding: 8px;
+  border: 3px solid #1a1a24;
+  box-shadow: 6px 6px 0px rgba(0,0,0,0.15);
+  cursor: var(--cursor-frame) !important;
   display: none;
 }
 
@@ -169,17 +161,11 @@ button:active {
   display: block;
 }
 
-/* Estado da imagem quando é selecionada pelo utilizador */
 .outputImage.selected {
-  /* Substituímos o 'box-shadow' suave por uma borda pontilhada agressiva */
   border: 6px dashed #00ff00;
   background-color: #ff00ff;
-  transform: scale(1.05); /* Mantemos o scale para feedback visual, mas sem animação */
+  transform: scale(1.05);
 }
-
-/* =========================================
-   TEXTOS DE STATUS (Carregamento, etc)
-   ========================================= */
 
 #status {
   background: none;

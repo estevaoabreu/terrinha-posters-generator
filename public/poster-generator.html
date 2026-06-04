@@ -37,6 +37,16 @@
 
     <script src="cores-cidades.js"></script>
     <script src="sketch.js"></script>
-    <script src="randomBg.js"></script>
+
+    <script>
+  let frame = 1;
+  const totalFrames = 4;
+
+  setInterval(() => {
+    // Tenta isto: remover o ponto inicial se a pasta 'cursor' está na raiz do servidor
+    document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+    frame = frame >= totalFrames ? 1 : frame + 1;
+  }, 200); 
+</script>
   </body>
 </html>
