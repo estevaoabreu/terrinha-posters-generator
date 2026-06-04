@@ -48,3 +48,19 @@ npm install
 ```bash
 node server.js
 ```
+
+### Image generation API
+
+This project now uses the Hugging Face Inference API for image generation. You need a (free) Hugging Face account to obtain an API token.
+
+1. Create a free account at https://huggingface.co/
+2. Go to your settings -> Access Tokens and create a new token (read access is enough).
+3. Create a `.env` file in the project root and add:
+
+```
+HUGGINGFACE_API_TOKEN=your_token_here
+```
+
+The server will read `HUGGINGFACE_API_TOKEN` and call the `runwayml/stable-diffusion-v1-5` model. If you want to use a different model, change the `hfUrl` in `server.js`.
+
+Note: Hugging Face provides a free tier for API tokens. Usage limits and quotas may apply.
