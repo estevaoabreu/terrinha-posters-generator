@@ -47,6 +47,12 @@ body {
   background: var(--bg);
   color: var(--text-hi);
   min-height: 100dvh;
+html {
+  font-family: "Comic Sans MS", sans-serif;
+}
+
+body {
+  height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -84,6 +90,23 @@ body {
 @keyframes pulse {
   0%, 100% { opacity: 0.7; }
   50%       { opacity: 1; }
+p,
+h1 {
+  color: #ffffff;
+}
+
+#start {
+  h1 {
+    width: 60%;
+    font-size: 5em;
+    margin-top: -0.5em;
+  }
+}
+
+input {
+  padding: 10px;
+  width: 300px;
+  font-family: "Comic Sans MS", sans-serif;
 }
 
 /* ── Form Layout ───────────────────────────────────────────── */
@@ -168,6 +191,12 @@ button {
   transition: background var(--dur) var(--ease-out),
               transform var(--dur) var(--ease-out),
               box-shadow var(--dur) var(--ease-out);
+  font-family: "Comic Sans MS", sans-serif;
+  padding: 10px 20px;
+  cursor: pointer;
+  color: white;
+  border: 5px solid white;
+  margin: 2em;
 }
 
 button:hover {
@@ -250,6 +279,33 @@ button#continueBtn:hover {
   box-shadow: 0 0 0 4px rgba(230,57,70,0.35),
               0 16px 40px rgba(0,0,0,0.5);
   transform: scale(1.02);
+#canvas {
+  flex-grow: 1;
+  margin: 2em;
+  width: 90%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 30%;
+    height: auto;
+  }
+}
+
+.outputImage {
+  border: 4px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  margin: 10px;
+}
+
+.outputImage.selected {
+  border: 4px solid var(--accent-color, white);
+  box-shadow: 0 0 20px var(--accent-color, white);
+  transform: scale(1.05);
 }
 
 /* ── Sketch / p5 Container ──────────────────────────────────── */

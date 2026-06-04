@@ -39,4 +39,14 @@
     <script src="script.js"></script>
     <script src="randomBg.js"></script>
   </body>
+  <script src="script.js"></script>
+  <script src="randomBg.js"></script>
+  <script lang="js">
+    var c = getRandomColor();
+    document.documentElement.style.setProperty('--accent-color', c);
+    document
+      .querySelectorAll("button")
+      .forEach((btn) => (btn.style.background = c));
+    document.getElementById("promptInputSanto").style.border = "5px solid " + c;
+  </script>
 </html>
