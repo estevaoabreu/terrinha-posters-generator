@@ -7,17 +7,26 @@
     <link rel="stylesheet" href="css.css" />
   </head>
   <body>
-
     <div class="marquee-bar">
       <div class="marquee-track">
-        <span>✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A ALDEIA! 🕯️ &nbsp;</span>
-        <span>✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A ALDEIA! 🕯️ &nbsp;</span>
+        <span
+          >✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA!
+          🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A
+          ALDEIA! 🕯️ &nbsp;</span
+        >
+        <span
+          >✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA!
+          🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A
+          ALDEIA! 🕯️ &nbsp;</span
+        >
       </div>
     </div>
 
     <div id="container">
       <div class="win-titlebar">
-        <span class="win-title-text"><span class="win-icon">⛪</span> Ecrã 2 — Escolha do Padroeiro</span>
+        <span class="win-title-text"
+          ><span class="win-icon">⛪</span> Ecrã 2 — Escolha do Padroeiro</span
+        >
         <div class="win-controls">
           <span class="win-btn">_</span>
           <span class="win-btn">□</span>
@@ -30,7 +39,11 @@
         <h2>Escolhe o padroeiro da festa!</h2>
 
         <div class="input-row">
-          <input type="text" id="promptInputSanto" placeholder="Nome do Santo..." />
+          <input
+            type="text"
+            id="promptInputSanto"
+            placeholder="Nome do Santo..."
+          />
           <button id="generateBtn">Gerar Imagens</button>
         </div>
 
@@ -41,21 +54,29 @@
         <div id="canvas">
           <div class="img-card" data-index="0">
             <img class="outputImage" id="img1" />
-            <span class="img-placeholder-label">Imagem 1</span>
           </div>
           <div class="img-card" data-index="1">
             <img class="outputImage" id="img2" />
-            <span class="img-placeholder-label">Imagem 2</span>
           </div>
           <div class="img-card" data-index="2">
             <img class="outputImage" id="img3" />
-            <span class="img-placeholder-label">Imagem 3</span>
           </div>
         </div>
 
         <div class="deco-bar"></div>
 
-        <a href="poster-generator.html" class="botao-entrar" style="background:linear-gradient(to bottom,#00cc44,#007722); color:#fff; border-top-color:#00ff66; border-left-color:#00ff66; border-right-color:#004411; border-bottom-color:#004411;">
+        <a
+          href="poster-generator.html"
+          class="botao-entrar"
+          style="
+            background: linear-gradient(to bottom, #00cc44, #007722);
+            color: #fff;
+            border-top-color: #00ff66;
+            border-left-color: #00ff66;
+            border-right-color: #004411;
+            border-bottom-color: #004411;
+          "
+        >
           Continuar para Cartazes ➜
         </a>
       </div>
@@ -65,32 +86,45 @@
     <script src="randomBg.js"></script>
     <script>
       // Mostrar canvas e loader apenas quando o utilizador clica em Gerar
-      document.getElementById('generateBtn').addEventListener('click', () => {
-        document.getElementById('canvas').classList.add('visible');
-        document.getElementById('status').classList.add('visible');
+      document.getElementById("generateBtn").addEventListener("click", () => {
+        document.getElementById("canvas").classList.add("visible");
+        document.getElementById("status").classList.add("visible");
       });
 
       // Selecção de imagem ao clicar no card
-      document.querySelectorAll('.img-card').forEach(card => {
-        card.addEventListener('click', (e) => {
+      document.querySelectorAll(".img-card").forEach((card) => {
+        card.addEventListener("click", (e) => {
           e.stopPropagation();
-          document.querySelectorAll('.img-card').forEach(c => c.classList.remove('selected'));
-          card.classList.add('selected');
-          const img = card.querySelector('img');
-          if (img && img.src) sessionStorage.setItem('selectedSaintImage', img.src);
+          document
+            .querySelectorAll(".img-card")
+            .forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+          const img = card.querySelector("img");
+          if (img && img.src)
+            sessionStorage.setItem("selectedSaintImage", img.src);
         });
       });
 
       // Clicar fora dos cards cancela a selecção
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.img-card') && !e.target.closest('button') && !e.target.closest('input') && !e.target.closest('a')) {
-          document.querySelectorAll('.img-card').forEach(c => c.classList.remove('selected'));
+      document.addEventListener("click", (e) => {
+        if (
+          !e.target.closest(".img-card") &&
+          !e.target.closest("button") &&
+          !e.target.closest("input") &&
+          !e.target.closest("a")
+        ) {
+          document
+            .querySelectorAll(".img-card")
+            .forEach((c) => c.classList.remove("selected"));
         }
       });
 
       let frame = 1;
       setInterval(() => {
-        document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+        document.documentElement.style.setProperty(
+          "--cursor-frame",
+          `url('/cursor/cursor${frame}.png') 0 0, auto`,
+        );
         frame = frame >= 4 ? 1 : frame + 1;
       }, 200);
     </script>

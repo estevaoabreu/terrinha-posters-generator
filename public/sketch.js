@@ -145,7 +145,9 @@ var createSketch = function (dna) {
 
     sketch.preload = function () {
       for (let nome of dynamicImagesConfig.artistas) {
-        imagensArtistas.push(sketch.loadImage("artistas/" + nome));
+        let img = sketch.loadImage("artistas/" + nome);
+        img.filename = nome;
+        imagensArtistas.push(img);
       }
 
       if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
@@ -213,6 +215,28 @@ var createSketch = function (dna) {
       selectedTemplate = [...templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result];
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
+
+      let artistBoxesCountSetup = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Artista (Imagem)")).length;
+      let numToRenderSetup = sketch.min(dna.numArtists, artistBoxesCountSetup);
+      numToRenderSetup = sketch.min(numToRenderSetup, userData.artistas.length);
+      let chosenArtists = userData.artistas.slice(0, numToRenderSetup);
+
+      if (userData.programacao && userData.programacao.length > 0) {
+        let progText = userData.programacao[0];
+        if (progText.includes("{ARTISTAS}")) {
+          let artistNames = chosenArtists.map(img => {
+            return img.filename ? img.filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : "Cantor Surpresa";
+          });
+          let artistsString = "Animação Musical";
+          if (artistNames.length === 1) {
+            artistsString = artistNames[0];
+          } else if (artistNames.length > 1) {
+            artistsString = artistNames.slice(0, -1).join(", ") + " e " + artistNames[artistNames.length - 1];
+          }
+          progText = progText.replace(/{ARTISTAS}/g, artistsString);
+        }
+        userData.programacao = [progText];
+      }
 
       sketch.noLoop();
 
@@ -585,7 +609,7 @@ function selectElite(index) {
   }
 }
 
-document.getElementById("generateBtn").addEventListener("click", () => {
+document.getElementById("generateBtn").addEventListener("click", async () => {
   if (templatesArrayGlobal.length === 0) {
     alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
     return;
@@ -593,6 +617,38 @@ document.getElementById("generateBtn").addEventListener("click", () => {
 
   const container = document.getElementById("sketch");
   
+  let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+  let inputDia = document.getElementById("promptInputDia")?.value?.trim();
+  let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
+
+  // If all inputs are empty, call the LLM to generate them
+  if (!inputLocalidade && !inputDia && !inputPrograma) {
+    container.style.display = "block";
+    container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A consultar a comissão de festas (LLM)... 🤖</h3>";
+    
+    try {
+      const response = await fetch("/api/generate-text", { method: "POST" });
+      if (!response.ok) {
+        let errText = await response.text();
+        try { errText = JSON.parse(errText).error; } catch(e){}
+        throw new Error(errText);
+      }
+      const data = await response.json();
+      
+      // Auto-fill the HTML inputs so the user can see/edit the generated text
+      document.getElementById("promptInputLocalidade").value = data.nomeTerrinha || "";
+      document.getElementById("promptInputDia").value = data.dataEvento || "";
+      document.getElementById("promptPrograma").value = data.programacao || "";
+      
+    } catch (err) {
+      console.error(err);
+      alert("Erro ao gerar texto com LLM: " + err.message + "\nPor favor preencha os campos manualmente.");
+      container.innerHTML = "";
+      return;
+    }
+  }
+
+  // Exibir a mensagem de carregamento
   container.style.display = "block";
   container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
   

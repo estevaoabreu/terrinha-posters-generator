@@ -8,20 +8,59 @@ const fetch = (...args) =>
 
 const app = express();
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
+const { GoogleGenAI } = require("@google/genai");
 
 app.use(express.json());
 app.use(express.static("public"));
+
+app.post("/api/generate-text", async (req, res) => {
+  try {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      throw new Error(
+        "GEMINI_API_KEY not configured. Please add it to your .env file.",
+      );
+    }
+
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+    // Prompt para o LLM gerar dados criativos de uma festa de aldeia
+    const prompt = `Gera detalhes criativos e humorísticos para uma festa popular fictícia típica de aldeia portuguesa ("festa da terrinha"). É importante que a festa e localidade não existam, mas pareçam reais.
+Deves devolver APENAS um objeto JSON válido com as seguintes 3 chaves:
+- "nomeTerrinha": O nome da festa ou aldeia em maiúsculas (ex: FESTAS DA NOSSA SENHORA DA AGONIA)
+- "dataEvento": Uma data típica, durante o verão, fim da primavera ou início do outono (ex: 12 A 15 DE AGOSTO)
+- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE a palavra exata '{ARTISTAS}' como placeholder onde eles atuariam. Não dês detalhes ou comentários sobre o programa, apenas datas, horas e títulos. Divide os artistas pelos vários dias. Exemplo: "SEXTA:\\n21h - Abertura da Quermesse\\n22h - Grande Baile com {ARTISTAS}\\nSÁBADO:\\n15h - Torneio da Malha"`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const jsonText = response.text;
+    res.json(JSON.parse(jsonText));
+  } catch (error) {
+    console.error("Erro no Gemini:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/api/images", (req, res) => {
   try {
     const artistasDir = path.join(__dirname, "public", "artistas");
     const logosDir = path.join(__dirname, "public", "logos");
-    
-    const artistas = fs.existsSync(artistasDir) ? fs.readdirSync(artistasDir).filter(f => !f.startsWith(".")) : [];
-    const logos = fs.existsSync(logosDir) ? fs.readdirSync(logosDir).filter(f => !f.startsWith(".")) : [];
-    
+
+    const artistas = fs.existsSync(artistasDir)
+      ? fs.readdirSync(artistasDir).filter((f) => !f.startsWith("."))
+      : [];
+    const logos = fs.existsSync(logosDir)
+      ? fs.readdirSync(logosDir).filter((f) => !f.startsWith("."))
+      : [];
+
     res.json({ artistas, logos });
   } catch (error) {
     res.status(500).json({ error: error.message });
