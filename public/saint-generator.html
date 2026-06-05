@@ -7,36 +7,72 @@
     <link rel="stylesheet" href="css.css" />
   </head>
   <body>
+
+    <div class="marquee-bar">
+      <marquee scrollamount="12">
+        ✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp;&nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp;&nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp;&nbsp; ✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp;&nbsp;
+      </marquee>
+    </div>
+
     <div id="container">
-      
-      <h2>Escolhe o padroeiro da festa!</h2>
-
-      <div class="input-group">
-        <input
-          type="text"
-          id="promptInputSanto"
-          placeholder="Insere o nome de um São/Santo/Santa..."
-        />
-        <button id="generateBtn">Gerar Imagens</button>
+      <div class="win-titlebar">
+        <span class="win-title-text"><span class="win-icon">⛪</span> Ecrã 2 — Escolha do Padroeiro</span>
+        <div class="win-controls">
+          <span class="win-btn">_</span>
+          <span class="win-btn">□</span>
+          <span class="win-btn">✕</span>
+        </div>
       </div>
 
-      <p id="status"></p>
+      <div class="win-content">
+        <div class="deco-bar"></div>
 
-      <div id="canvas">
-        <img class="outputImage" id="img1" />
-        <img class="outputImage" id="img2" />
-        <img class="outputImage" id="img3" />
+        <h2>Escolhe o padroeiro da festa!</h2>
+
+        <div class="input-row">
+          <input type="text" id="promptInputSanto" placeholder="Nome do Santo..." />
+          <button id="generateBtn">⚡ Gerar Imagens</button>
+        </div>
+
+        <p id="status"></p>
+
+        <div class="star-divider">— Clica numa imagem para a selecionar —</div>
+
+        <div id="canvas">
+          <div class="img-card" data-index="0">
+            <img class="outputImage" id="img1" alt="Imagem 1" />
+            <span class="img-placeholder-label">Imagem 1</span>
+          </div>
+          <div class="img-card" data-index="1">
+            <img class="outputImage" id="img2" alt="Imagem 2" />
+            <span class="img-placeholder-label">Imagem 2</span>
+          </div>
+          <div class="img-card" data-index="2">
+            <img class="outputImage" id="img3" alt="Imagem 3" />
+            <span class="img-placeholder-label">Imagem 3</span>
+          </div>
+        </div>
+
+        <div class="deco-bar"></div>
+
+        <a href="poster-generator.html" class="botao-entrar" style="background:linear-gradient(to bottom,#00cc44,#007722); color:#fff; border-top-color:#00ff66; border-left-color:#00ff66; border-right-color:#004411; border-bottom-color:#004411;">
+          Continuar para Cartazes ➜
+        </a>
       </div>
-
-      <a href="poster-generator.html" class="botao-entrar" style="margin-top: 30px;">
-        Continuar para Cartazes =>
-      </a>
-      
     </div>
 
     <script src="script.js"></script>
     <script src="randomBg.js"></script>
     <script>
+      document.querySelectorAll('.img-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.img-card').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          const img = card.querySelector('img');
+          if (img && img.src) sessionStorage.setItem('selectedSaintImage', img.src);
+        });
+      });
+
       let frame = 1;
       setInterval(() => {
         document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);

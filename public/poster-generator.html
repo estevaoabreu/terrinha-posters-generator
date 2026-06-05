@@ -9,18 +9,60 @@
     <script src="p5.min.js"></script>
   </head>
   <body>
+
+    <div class="marquee-bar">
+      <marquee scrollamount="12">
+        🎨 CRIA O TEU CARTAZ! 🎨 &nbsp;&nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp;&nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp;&nbsp; 🎨 CRIA O TEU CARTAZ! 🎨 &nbsp;&nbsp;
+      </marquee>
+    </div>
+
     <div id="container">
-      <h1>Gerador de Cartaz</h1>
-      <h2>Insere as informações</h2>
+      <div class="win-titlebar">
+        <span class="win-title-text"><span class="win-icon">🖼️</span> Ecrã 3 — Gerador de Cartaz</span>
+        <div class="win-controls">
+          <span class="win-btn">_</span>
+          <span class="win-btn">□</span>
+          <span class="win-btn">✕</span>
+        </div>
+      </div>
 
-      <input type="text" id="promptInputLocalidade" placeholder="Nome da festa" />
-      <textarea id="promptPrograma" placeholder="Programa (ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X)"></textarea>
-      <input type="number" id="promptNúmeroLogos" placeholder="Nº de logos" min="0" step="1" />
-      <input type="text" id="promptInputDia" placeholder="Data (ex: 23 a 25 Junho)" />
+      <div class="win-content">
+        <div class="deco-bar"></div>
+        <h1 style="font-size:2.4em; margin-bottom:0.3em;">Gerador de Cartaz</h1>
 
-      <button id="generateBtn" type="button">Gerar Cartaz</button>
+        <div class="poster-layout">
 
-      <div id="sketch"></div>
+          <!-- ESQUERDA: FORMULÁRIO -->
+          <div class="poster-form-panel">
+            <h2>Informações</h2>
+
+            <label class="form-label">📍 Localização da festa</label>
+            <input type="text" id="promptInputLocalidade" placeholder="Ex: Aldeia de Cima, Viseu" />
+
+            <label class="form-label">📋 Programa</label>
+            <textarea id="promptPrograma" placeholder="Ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X&#10;DOMINGO: Missa e Arraial"></textarea>
+
+            <label class="form-label">🏷️ Nº de logos</label>
+            <input type="number" id="promptNúmeroLogos" placeholder="Ex: 3" min="0" step="1" />
+
+            <label class="form-label">📅 Data</label>
+            <input type="text" id="promptInputDia" placeholder="Ex: 23 a 25 de Junho" />
+
+            <button id="generateBtn" type="button" class="botao-gerar">
+              🖨️ GERAR CARTAZ
+            </button>
+          </div>
+
+          <!-- DIREITA: CANVAS / PREVIEW -->
+          <div class="poster-preview-panel">
+            <p class="poster-preview-label">[ Pré-visualização do Cartaz ]</p>
+            <div id="sketch"></div>
+          </div>
+
+        </div>
+
+        <div class="deco-bar" style="margin-top:24px;"></div>
+      </div>
     </div>
 
     <script src="cores-cidades.js"></script>

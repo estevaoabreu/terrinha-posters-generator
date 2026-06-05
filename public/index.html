@@ -7,24 +7,49 @@
     <link rel="stylesheet" href="css.css" />
   </head>
   <body>
-    <div id="container">
-      <marquee scrollamount="15" style="background: red; color: yellow; font-family: 'Comic Sans MS'; font-size: 24px; font-weight: bold; padding: 10px; border-bottom: 5px solid white; margin-bottom: 20px;">
-        🎇 HÁ BIFANAS! 🎇 CERVEJA A 1€! 🎇 MUSICA BOA E MUITO MAIS! 🎇 TUDO A SALTAR! 🎇
+
+    <div class="marquee-bar">
+      <marquee scrollamount="12">
+        🎇 HÁ BIFANAS E CERVEJA! 🎇 &nbsp;&nbsp; 🍺 CERVEJA A 1€! 🍺 &nbsp;&nbsp; 🎶 MÚSICA BOA! 🎶 &nbsp;&nbsp; 🎉 TUDO A SALTAR! 🎉 &nbsp;&nbsp; 🥩 CHOURIÇOS A ASSAR! 🥩 &nbsp;&nbsp; 🎇 HÁ BIFANAS E CERVEJA! 🎇 &nbsp;&nbsp; 🍷 VINHO VERDE FRESCO! 🍷 &nbsp;&nbsp;
       </marquee>
+    </div>
 
-      <h1>Gerador de Cartazes <br> para Festas da Terrinha</h1>
-      
-      <p style="background: black; color: lime; font-weight: bold; padding: 10px; border: 2px solid white;">
-        Pisca o olho à comissão de festas e clica no botão para começar!
-      </p>
+    <div id="container">
+      <div class="win-titlebar">
+        <span class="win-title-text"><span class="win-icon">🎪</span> Terrinhas.exe — Gerador de Cartazes</span>
+        <div class="win-controls">
+          <span class="win-btn">_</span>
+          <span class="win-btn">□</span>
+          <span class="win-btn">✕</span>
+        </div>
+      </div>
 
-      <a href="saint-generator.html" class="botao-entrar">
-        ENTRAR NA FESTA
-      </a>
+      <div class="win-content">
+        <div class="deco-bar"></div>
+
+        <h1>Gerador de Cartazes<br>para Festas da Terrinha</h1>
+
+        <div class="star-divider">★ ★ ★ ★ ★ ★ ★ ★ ★</div>
+
+        <p style="background:#000080; color:#ffff00; font-weight:bold; padding:12px 20px; border:3px outset #c0c0c0; display:inline-block; margin:14px 0; font-size:1.05em;">
+          🥂 Pisca o olho à comissão de festas e clica no botão para começar! 🥂
+        </p>
+
+        <div class="deco-bar"></div>
+        <br>
+
+        <a href="saint-generator.html" class="botao-entrar-grande">
+          🎉 ENTRAR NA FESTA 🎉
+        </a>
+        <br>
+
+        <div class="star-divider" style="margin-top:22px;">
+          <span class="blink">★</span> Desenvolvido pela Comissão de Festas MDM <span class="blink">★</span>
+        </div>
+      </div>
     </div>
 
     <script src="randomBg.js"></script>
-
     <script>
       let frame = 1;
       setInterval(() => {
