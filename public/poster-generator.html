@@ -9,21 +9,29 @@
     <script src="p5.min.js"></script>
   </head>
   <body>
-
     <div class="marquee-bar">
       <div class="marquee-track">
-        <span>🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️ &nbsp;</span>
-        <span>🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️ &nbsp;</span>
+        <span
+          >🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇
+          FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️
+          &nbsp;</span
+        >
+        <span
+          >🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇
+          FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️
+          &nbsp;</span
+        >
       </div>
     </div>
 
     <!-- LAYOUT COM DUAS JANELAS WIN95 LADO A LADO -->
     <div class="dual-window-wrapper">
-
       <!-- JANELA ESQUERDA: FORMULÁRIO -->
       <div id="container">
         <div class="win-titlebar">
-          <span class="win-title-text"><span class="win-icon">🖼️</span> Ecrã 3 — Gerador de Cartaz</span>
+          <span class="win-title-text"
+            ><span class="win-icon">🖼️</span> Ecrã 3 — Gerador de Cartaz</span
+          >
           <div class="win-controls">
             <span class="win-btn">_</span>
             <span class="win-btn">□</span>
@@ -37,70 +45,120 @@
 
           <h2>Informações</h2>
 
-          <label class="form-label">📍 Localização da festa</label>
-          <input type="text" id="promptInputLocalidade" placeholder="Ex: Aldeia de Cima, Viseu" />
+          <label class="form-label">🎉 Nome da festa</label>
+          <input
+            type="text"
+            id="promptInputNomeFesta"
+            placeholder="Ex: Festas de São João"
+          />
+
+          <label class="form-label">📍 Localidade</label>
+          <input
+            type="text"
+            id="promptInputLocalidade"
+            placeholder="Ex: Aldeia de Cima, Viseu"
+          />
 
           <label class="form-label">📋 Programa</label>
-          <textarea id="promptPrograma" placeholder="Ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X&#10;DOMINGO: Missa e Arraial"></textarea>
+          <textarea
+            id="promptPrograma"
+            placeholder="Ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X&#10;DOMINGO: Missa e Arraial"
+          ></textarea>
 
           <label class="form-label">🏷️ Nº de patrocinadores</label>
-          <input type="number" id="promptNúmeroPatrocinadores" placeholder="Ex: 3" min="0" step="1" />
+          <input
+            type="number"
+            id="promptNúmeroPatrocinadores"
+            placeholder="Ex: 3"
+            min="0"
+            step="1"
+          />
 
           <label class="form-label">📅 Data</label>
-          <input type="text" id="promptInputDia" placeholder="Ex: 23 a 25 de Junho" />
+          <input
+            type="text"
+            id="promptInputDia"
+            placeholder="Ex: 23 a 25 de Junho"
+          />
 
           <button id="generateBtn" type="button" class="botao-gerar">
             🖨️ GERAR CARTAZ
           </button>
 
-          <div class="deco-bar" style="margin-top:20px;"></div>
+          <div class="deco-bar" style="margin-top: 20px"></div>
         </div>
       </div>
 
       <!-- JANELA DIREITA: PREVIEW (SEGUNDA JANELA WIN95) -->
       <div class="win-preview-container">
         <div class="win-titlebar">
-          <span class="win-title-text"><span class="win-icon">🗂️</span> Pré-visualização do Cartaz</span>
+          <span class="win-title-text"
+            ><span class="win-icon">🗂️</span> Pré-visualização do Cartaz</span
+          >
           <div class="win-controls">
             <span class="win-btn">_</span>
             <span class="win-btn">□</span>
-            <span class="win-btn win-btn-close" id="closePreviewBtn" title="Apagar cartaz">✕</span>
+            <span
+              class="win-btn win-btn-close"
+              id="closePreviewBtn"
+              title="Apagar cartaz"
+              >✕</span
+            >
           </div>
         </div>
 
         <div class="preview-win-content">
           <p class="poster-preview-label" id="previewPlaceholder">
-            [ Preenche o formulário e clica em<br>"🖨️ GERAR CARTAZ" para começar ]
+            [ Preenche o formulário e clica em<br />"🖨️ GERAR CARTAZ" para
+            começar ]
           </p>
           <div id="sketch"></div>
-          <button id="exportBtn" type="button" class="botao-gerar" style="display: none; margin-top: 20px; background: linear-gradient(to bottom, #44ff44, #008800) !important; width: 80%;">
+          <button
+            id="exportBtn"
+            type="button"
+            class="botao-gerar"
+            style="
+              display: none;
+              margin-top: 20px;
+              background: linear-gradient(
+                to bottom,
+                #44ff44,
+                #008800
+              ) !important;
+              width: 80%;
+            "
+          >
             💾 EXPORTAR SELECIONADO
           </button>
         </div>
       </div>
-
     </div>
 
     <script src="cores-cidades.js"></script>
     <script src="sketch.js"></script>
     <script>
       // Botão X: apaga o cartaz gerado, restaura o placeholder
-      document.getElementById('closePreviewBtn').addEventListener('click', () => {
-        const sketchContainer = document.getElementById('sketch');
-        sketchContainer.innerHTML = '';
-        sketchContainer.style.display = 'flex'; // restore original display just in case
-        document.getElementById('previewPlaceholder').style.display = 'block';
-        document.getElementById('exportBtn').style.display = 'none';
-      });
+      document
+        .getElementById("closePreviewBtn")
+        .addEventListener("click", () => {
+          const sketchContainer = document.getElementById("sketch");
+          sketchContainer.innerHTML = "";
+          sketchContainer.style.display = "flex"; // restore original display just in case
+          document.getElementById("previewPlaceholder").style.display = "block";
+          document.getElementById("exportBtn").style.display = "none";
+        });
 
       // Esconde o placeholder quando o cartaz começa a ser gerado
-      document.getElementById('generateBtn').addEventListener('click', () => {
-        document.getElementById('previewPlaceholder').style.display = 'none';
+      document.getElementById("generateBtn").addEventListener("click", () => {
+        document.getElementById("previewPlaceholder").style.display = "none";
       });
 
       let frame = 1;
       setInterval(() => {
-        document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);
+        document.documentElement.style.setProperty(
+          "--cursor-frame",
+          `url('/cursor/cursor${frame}.png') 0 0, auto`,
+        );
         frame = frame >= 4 ? 1 : frame + 1;
       }, 200);
     </script>

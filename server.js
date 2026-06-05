@@ -29,10 +29,11 @@ app.post("/api/generate-text", async (req, res) => {
 
     // Prompt para o LLM gerar dados criativos de uma festa de aldeia
     const prompt = `Gera detalhes criativos e humorísticos para uma festa popular fictícia típica de aldeia portuguesa ("festa da terrinha"). É importante que a festa e localidade não existam, mas pareçam reais.
-Deves devolver APENAS um objeto JSON válido com as seguintes 3 chaves:
-- "nomeTerrinha": O nome da festa ou aldeia em maiúsculas (ex: FESTAS DA NOSSA SENHORA DA AGONIA).
+Deves devolver APENAS um objeto JSON válido com as seguintes 4 chaves:
+- "nomeFesta": O nome da festa em maiúsculas (ex: FESTAS DE SÃO JOÃO).
+- "localidade": O nome da aldeia ou localidade (ex: Aldeia de Cima, Viseu).
 - "dataEvento": Uma data típica, durante o verão, fim da primavera ou início do outono (ex: 12 A 15 DE AGOSTO)
-- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE as palavras exatas '{ARTISTAS}' como placeholder onde eles atuariam. Não dês detalhes ou comentários sobre o programa, apenas datas, horas e títulos breves. Divide os artistas pelos vários dias. Exemplo: "SEXTA:\\n21h - Abertura da Quermesse\\n22h - Grande Baile com {ARTISTAS}\\nSÁBADO:\\n15h - Torneio da Malha"`;
+- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE estes artistas '{ARTISTAS}', cada um deve dar um concerto num dia diferente. Não dês detalhes ou comentários sobre o programa, apenas datas, horas e títulos breves, cada linha deve ter, no máximo 7 palavras. Divide os artistas pelos vários dias. Exemplo: "SEXTA:\\n21h - Abertura da Quermesse\\n22h - Artista\\nSÁBADO:\\n15h - Torneio da Malha"`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",

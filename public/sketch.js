@@ -33,7 +33,7 @@ class PosterDNA {
       this.numArtists = Math.floor(Math.random() * 5) + 1;
       this.textScales = [];
       for (let i = 0; i < 5; i++) {
-        this.textScales.push(Math.random() * 0.4 + 0.6); 
+        this.textScales.push(Math.random() * 0.2 + 0.9); // 0.9 to 1.1
       }
     }
   }
@@ -66,7 +66,7 @@ class PosterDNA {
     }
     for (let i = 0; i < 5; i++) {
       if (Math.random() < mutationRate) {
-        this.textScales[i] = Math.random() * 0.4 + 0.6;
+        this.textScales[i] = Math.random() * 0.2 + 0.9;
       }
     }
   }
@@ -166,8 +166,11 @@ var createSketch = function (dna) {
     sketch.setup = function () {
       sketch.createCanvas(600, 850);
 
+      let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
+      if (inputNomeFesta) userData.nomeTerrinha = inputNomeFesta.toUpperCase();
+
       let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
-      if (inputLocalidade) userData.nomeTerrinha = inputLocalidade.toUpperCase();
+      if (inputLocalidade) userData.local = inputLocalidade;
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
       if (inputDia) userData.dataEvento = inputDia;
@@ -599,7 +602,7 @@ var createSketch = function (dna) {
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
 
       let minSize = 10;
-      let maxSize = 200;
+      let maxSize = 400;
       let optimalSize = minSize;
       let low = minSize;
       let high = maxSize;
@@ -689,12 +692,13 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
   const container = document.getElementById("sketch");
   
+  let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
   let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
   // Se todos os inputs estiverem vazios, pede à IA do Gemini para os gerar
-  if (!inputLocalidade && !inputDia && !inputPrograma) {
+  if (!inputNomeFesta && !inputLocalidade && !inputDia && !inputPrograma) {
     container.style.display = "block";
     container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A consultar a comissão de festas (LLM)... 🤖</h3>";
     
@@ -707,7 +711,8 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       }
       const data = await response.json();
       
-      document.getElementById("promptInputLocalidade").value = data.nomeTerrinha || "";
+      document.getElementById("promptInputNomeFesta").value = data.nomeFesta || "";
+      document.getElementById("promptInputLocalidade").value = data.localidade || "";
       document.getElementById("promptInputDia").value = data.dataEvento || "";
       document.getElementById("promptPrograma").value = data.programacao || "";
       
