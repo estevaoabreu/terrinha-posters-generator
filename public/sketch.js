@@ -571,7 +571,7 @@ document.getElementById("generateBtn").addEventListener("click", () => {
 // Listener para exportar o cartaz
 document.getElementById("exportBtn")?.addEventListener("click", () => {
   if (globalPopulation.eliteIndex >= 0) {
-    const selectedCanvas = document.querySelector(\`#poster-mini-\${globalPopulation.eliteIndex} canvas\`);
+    const selectedCanvas = document.querySelector(`#poster-mini-${globalPopulation.eliteIndex} canvas`);
     if (selectedCanvas) {
       const link = document.createElement('a');
       link.download = 'cartaz-terrinha.png';
