@@ -18,6 +18,7 @@ fetch("posicoes.json")
   })
   .catch(err => console.error("Erro ao carregar posicoes.json:", err));
 
+<<<<<<< Updated upstream
 class PosterDNA {
   constructor(templateIdx, titleFont, bodyFont, numArtists, textScales) {
     if (templateIdx !== undefined) {
@@ -35,10 +36,193 @@ class PosterDNA {
       this.textScales = [];
       for (let i = 0; i < 5; i++) {
         this.textScales.push(Math.random() * 0.4 + 0.6); // 0.6 to 1.0
+=======
+  let selectedTitleFont;
+  let selectedBodyFont;
+  let paletaAtiva = null;
+
+  let userData = {
+    nomeTerrinha: "FESTAS DE SÃO JOÃO",
+    dataEvento: "23 A 25 DE JUNHO",
+    local: "Largo da Igreja, Ribeira",
+    programacao: [
+      "SEXTA:\n22h - Quim Barreiros",
+      "SÁBADO:\n21h - Banda Pimba\n23h - Fogo de Artifício",
+      "DOMINGO:\n15h - Missa",
+    ],
+    patrocinios: "Café Central | Talho do Zé | Junta de Freguesia",
+    artistas: [],
+    patrociniosImagens: []
+  };
+
+  sketch.preload = function () {
+    templatesDB = sketch.loadJSON("posicoes.json");
+
+    for (let nome of dynamicImagesConfig.artistas) {
+      imagensArtistas.push(sketch.loadImage("artistas/" + nome));
+    }
+
+    if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
+      for (let nome of dynamicImagesConfig.logos) {
+        logos.push(sketch.loadImage("patrocinios/" + nome));
+      }
+    } else {
+      for (let i = 1; i <= 21; i++) {
+        logos.push(sketch.loadImage("patrocinios/p" + i + ".png"));
+      }
+    }
+
+    let storedSaintImage = localStorage.getItem("selectedSaintImage");
+    if (storedSaintImage) {
+      saintImage = sketch.loadImage(storedSaintImage);
+    }
+  };
+
+  sketch.setup = function () {
+    sketch.createCanvas(600, 850);
+
+    let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+    if (inputLocalidade) userData.nomeTerrinha = inputLocalidade.toUpperCase();
+
+    let inputDia = document.getElementById("promptInputDia")?.value?.trim();
+    if (inputDia) userData.dataEvento = inputDia;
+
+    let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
+    if (inputPrograma) {
+      userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
+    }
+
+    userData.artistas = sketch.shuffle(imagensArtistas.slice());
+
+    // Leitura robusta do número de logos pedido pelo utilizador
+    let inputNumLogosEl = document.getElementById("promptNúmeroLogos");
+    let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
+    let numLogos = 3; // Valor padrão
+    if (inputNumLogos && inputNumLogos.trim() !== "") {
+      let parsedNum = parseInt(inputNumLogos, 10);
+      if (!isNaN(parsedNum)) numLogos = parsedNum;
+    }
+    
+    // Aloca as imagens baseando-se ESPECIFICAMENTE na quantidade pedida, 
+    // repetindo ou cortando conforme estritamente necessário.
+    userData.patrociniosImagens = [];
+    if (logos.length > 0 && numLogos > 0) {
+      let shuffledLogos = sketch.shuffle(logos.slice());
+      for (let i = 0; i < numLogos; i++) {
+        userData.patrociniosImagens.push(shuffledLogos[i % shuffledLogos.length]);
+      }
+    }
+
+    if (typeof resolverPaleta === "function") {
+      paletaAtiva = resolverPaleta(inputLocalidade || null);
+      if (typeof aplicarGradienteFundo === "function") {
+        aplicarGradienteFundo(inputLocalidade || null);
+      }
+    } else {
+      paletaAtiva = {
+        gradient: ["#140028", "#2E0052"],
+        text: ["#FFD700", "#FFFFFF"],
+      };
+    }
+
+    let templatesArray = Object.values(templatesDB);
+    let randomIndex = sketch.floor(sketch.random(templatesArray.length));
+    
+    // Clonamos o array do template para evitar mutar o JSON original carregado
+    selectedTemplate = [...templatesArray[randomIndex].annotations[0].result];
+
+    selectedTitleFont = sketch.random(titleFonts);
+    selectedBodyFont = sketch.random(bodyFonts);
+
+    sketch.noLoop();
+
+    if (document.fonts) {
+      document.fonts.ready.then(() => {
+        sketch.redraw();
+      });
+    }
+  };
+
+  sketch.draw = function () {
+    saintDrawn = false;
+    const [bgA, bgB] = paletaAtiva.gradient;
+    _drawGradientBackground(bgA, bgB);
+
+    let allSponsorBoxes = [];
+    let lowestElementY = 0;
+
+    // Localizar todas as caixas de patrocínios e a altura máxima ocupada
+    for (let box of selectedTemplate) {
+      let rawLabel = box.value.rectanglelabels[0];
+      let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+      
+      let boxBottom = box.value.y + box.value.height;
+      if (boxBottom > lowestElementY) lowestElementY = boxBottom;
+
+      if (label.includes("Patrocínios")) {
+        allSponsorBoxes.push(box);
+      }
+    }
+
+    let finalSponsorBox = null;
+
+    if (allSponsorBoxes.length > 0) {
+      // INTELIGÊNCIA: Se houver várias caixas sobrepostas de patrocínios no JSON, 
+      // escolhe apenas a MAIOR, ignorando anotações erradas/pequenas.
+      finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
+        let prevArea = prev.value.width * prev.value.height;
+        let currArea = current.value.width * current.value.height;
+        return (currArea > prevArea) ? current : prev;
+      });
+    } else if (userData.patrociniosImagens.length > 0) {
+      // Fallback: Se o layout não tiver caixa nenhuma, criamos uma na base
+      let startY = Math.max(lowestElementY + 2, 85); 
+      if (startY > 92) startY = 90; 
+
+      finalSponsorBox = {
+        value: {
+          x: 5,
+          y: startY,
+          width: 90,
+          height: 98 - startY,
+          rectanglelabels: ["Patrocínios"]
+        }
+      };
+      selectedTemplate.push(finalSponsorBox);
+    }
+
+    let indiceArtista = 0;
+    let indiceProgramacao = 0;
+
+    for (let box of selectedTemplate) {
+      let rawLabel = box.value.rectanglelabels[0];
+      let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+
+      let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
+      let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
+      let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
+      let pHeight = sketch.map(box.value.height, 0, 100, 0, sketch.height);
+
+      let conteudoDinamico = "";
+
+      if (label.includes("Artista (Imagem)")) {
+        if (userData.artistas.length > 0) {
+          conteudoDinamico = userData.artistas[indiceArtista % userData.artistas.length];
+        }
+        indiceArtista++;
+      } else if (label.includes("Programação")) {
+        conteudoDinamico = userData.programacao[indiceProgramacao % userData.programacao.length];
+        indiceProgramacao++;
+      } else if (label.includes("Patrocínios")) {
+        // Ignora qualquer caixa extra, só alimenta a caixa principal (Flexbox)
+        if (box !== finalSponsorBox) continue; 
+        conteudoDinamico = userData.patrociniosImagens;
+>>>>>>> Stashed changes
       }
     }
   }
 
+<<<<<<< Updated upstream
   crossover(partner) {
     let child = new PosterDNA();
     child.templateIdx = Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
@@ -148,6 +332,17 @@ var createSketch = function (dna) {
       ],
       patrocinios: "Café Central | Talho do Zé | Junta de Freguesia",
       artistas: [],
+=======
+  function _drawGradientBackground(corA, corB) {
+    const toRGB = (cssColor) => {
+      const el = document.createElement("div");
+      el.style.color = cssColor;
+      document.body.appendChild(el);
+      const computed = getComputedStyle(el).color;
+      document.body.removeChild(el);
+      const m = computed.match(/\d+/g);
+      return m ? m.map(Number) : [0, 0, 0];
+>>>>>>> Stashed changes
     };
 
     sketch.preload = function () {
@@ -198,6 +393,7 @@ var createSketch = function (dna) {
           text: ["#FFD700", "#FFFFFF"],
         };
       }
+<<<<<<< Updated upstream
 
       // Assign DNA genes
       selectedTemplate = templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result;
@@ -380,6 +576,48 @@ var createSketch = function (dna) {
       sketch.textStyle(style);
       // We align text vertically and horizontally within the bounding box
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
+=======
+    } else if (label.includes("Patrocínios")) {
+      if (conteudoDinamico && conteudoDinamico.length > 0) {
+        drawSponsorsGrid(conteudoDinamico, x, y, w, h);
+      }
+    }
+  }
+
+  function drawSponsorsGrid(logosArray, bx, by, bw, bh) {
+    if (!logosArray || logosArray.length === 0) return;
+
+    let n = logosArray.length;
+    let gap = 10; 
+
+    // O algoritmo calcula o número ideal de colunas e linhas
+    let aspectBox = bw / bh;
+    let cols = sketch.ceil(sketch.sqrt(n * aspectBox));
+    let rows = sketch.ceil(n / cols);
+
+    while (cols * rows < n) {
+      cols++;
+      rows = sketch.ceil(n / cols);
+    }
+
+    // Calcula o espaço real que cada item pode ocupar na grelha sem se deformar
+    let cellW = (bw - gap * (cols - 1)) / cols;
+    let cellH = (bh - gap * (rows - 1)) / rows;
+
+    for (let i = 0; i < n; i++) {
+      let col = i % cols;
+      let row = sketch.floor(i / cols);
+
+      let cx = bx + col * (cellW + gap);
+      let cy = by + row * (cellH + gap);
+
+      let img = logosArray[i];
+      if (img && img.width > 0 && img.height > 0) {
+        drawImageContain(img, cx, cy, cellW, cellH);
+      }
+    }
+  }
+>>>>>>> Stashed changes
 
       let minSize = 10;
       let maxSize = 200;
@@ -470,6 +708,7 @@ function selectElite(index) {
 }
 
 document.getElementById("generateBtn").addEventListener("click", () => {
+<<<<<<< Updated upstream
   if (templatesArrayGlobal.length === 0) {
     alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
     return;
@@ -582,3 +821,8 @@ document.getElementById("exportBtn")?.addEventListener("click", () => {
     alert("Por favor, selecione um cartaz para exportar.");
   }
 });
+=======
+  document.getElementById("sketch").innerHTML = "";
+  let posterSketch = new p5(sketch, "sketch");
+});
+>>>>>>> Stashed changes
