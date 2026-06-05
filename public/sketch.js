@@ -134,11 +134,7 @@ var createSketch = function (dna) {
       nomeTerrinha: "FESTAS DE SÃO JOÃO",
       dataEvento: "23 A 25 DE JUNHO",
       local: "Largo da Igreja, Ribeira",
-      programacao: [
-        "SEXTA:\n22h - Quim Barreiros",
-        "SÁBADO:\n21h - Banda Pimba\n23h - Fogo de Artifício",
-        "DOMINGO:\n15h - Missa",
-      ],
+      programacao: [],
       artistas: [],
       patrociniosImagens: []
     };
@@ -182,22 +178,29 @@ var createSketch = function (dna) {
 
       userData.artistas = sketch.shuffle(imagensArtistas.slice());
 
-      // ---> LÓGICA RESTRITA E EXATA PARA QUANTIDADE DE PATROCINADORES <---
+      // ---> LÓGICA DE LIMITES RIGOROSOS PARA PATROCINADORES (0 ATÉ MÁXIMO DA PASTA) <---
       let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
-      let numLogos = 3; 
+      let numLogos = 3; // Valor padrão se a caixa estiver vazia
+      
+      // Atualiza o limite máximo na interface do utilizador
+      if (inputNumLogosEl) {
+         inputNumLogosEl.max = logos.length;
+      }
       
       if (inputNumLogos && inputNumLogos.trim() !== "") {
         let parsedNum = parseInt(inputNumLogos, 10);
         if (!isNaN(parsedNum)) numLogos = parsedNum;
       }
       
+      // GARANTIA DE LIMITES: O número não pode ser menor que 0 nem maior que o total de imagens
+      numLogos = sketch.max(0, sketch.min(numLogos, logos.length));
+
       userData.patrociniosImagens = [];
+      // Se numLogos for 0, o array de imagens de patrocínios fica simplesmente vazio
       if (logos.length > 0 && numLogos > 0) {
         let shuffledLogos = sketch.shuffle(logos.slice());
-        // NOVO: Limita o número exato sem nunca repetir imagens (mesmo se pedir 30, mas só houver 21)
-        let totalValido = sketch.min(numLogos, shuffledLogos.length);
-        for (let i = 0; i < totalValido; i++) {
+        for (let i = 0; i < numLogos; i++) {
           userData.patrociniosImagens.push(shuffledLogos[i]);
         }
       }
@@ -214,7 +217,7 @@ var createSketch = function (dna) {
         };
       }
 
-      // Clone Profundo do Template: Garante que as alterações de altura não quebram futuras gerações
+      // Evita corromper os templates com cópia profunda
       selectedTemplate = JSON.parse(JSON.stringify(templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result));
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
@@ -255,7 +258,6 @@ var createSketch = function (dna) {
       const [bgA, bgB] = paletaAtiva.gradient;
       _drawGradientBackground(bgA, bgB);
 
-      // ---> DETEÇÃO DA MELHOR ZONA PARA OS PATROCINADORES <---
       let filteredTemplate = [];
       let lowestElementY = 0;
       let allSponsorBoxes = [];
@@ -266,7 +268,6 @@ var createSketch = function (dna) {
         
         if (!label.includes("Patrocínios")) {
           filteredTemplate.push(box); 
-          // O Santo ocupa a área toda, logo não conta para o limite inferior dos elementos de informação
           if (!label.includes("Sant@ (Figura)")) {
              let boxBottom = box.value.y + box.value.height;
              if (boxBottom > lowestElementY) lowestElementY = boxBottom;
@@ -277,33 +278,34 @@ var createSketch = function (dna) {
       }
 
       let finalSponsorBox = null;
-      if (allSponsorBoxes.length > 0) {
-        finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
-          let prevArea = prev.value.width * prev.value.height;
-          let currArea = current.value.width * current.value.height;
-          return (currArea > prevArea) ? current : prev;
-        });
-        filteredTemplate.push(finalSponsorBox);
-      } else if (userData.patrociniosImagens.length > 0) {
-        let startY = Math.max(lowestElementY + 2, 80); 
-        if (startY > 90) startY = 88; 
-        
-        finalSponsorBox = {
-          value: { x: 5, y: startY, width: 90, height: 97 - startY, rectanglelabels: ["Patrocínios"] }
-        };
-        filteredTemplate.push(finalSponsorBox);
+      // Só preparamos a caixa de patrocínios se realmente existirem patrocínios a desenhar (numLogos > 0)
+      if (userData.patrociniosImagens.length > 0) {
+        if (allSponsorBoxes.length > 0) {
+          finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
+            let prevArea = prev.value.width * prev.value.height;
+            let currArea = current.value.width * current.value.height;
+            return (currArea > prevArea) ? current : prev;
+          });
+          filteredTemplate.push(finalSponsorBox);
+        } else {
+          let startY = Math.max(lowestElementY + 2, 80); 
+          if (startY > 90) startY = 88; 
+          
+          finalSponsorBox = {
+            value: { x: 5, y: startY, width: 90, height: 97 - startY, rectanglelabels: ["Patrocínios"] }
+          };
+          filteredTemplate.push(finalSponsorBox);
+        }
       }
 
-      // ---> SISTEMA ANTI-COLISÃO (Cortar a Programação) <---
+      // Sistema anti-colisão (Cortar a Programação caso bata nos patrocinadores)
       if (finalSponsorBox) {
         let sponsorTop = finalSponsorBox.value.y;
         for (let box of filteredTemplate) {
           if (box !== finalSponsorBox) {
             let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
-            // A imagem do Santo (fundo) é a única que não é cortada
             if (!label.includes("Sant@ (Figura)")) {
               let boxBottom = box.value.y + box.value.height;
-              // Se a caixa de texto tocar na zona dos patrocinadores, cortamo-la!
               if (boxBottom > sponsorTop) {
                  box.value.height = Math.max(2, sponsorTop - box.value.y - 1);
               }
@@ -318,7 +320,7 @@ var createSketch = function (dna) {
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
       numToRender = sketch.min(numToRender, userData.artistas.length);
 
-      // ---> DISTRIBUIÇÃO INTELIGENTE DA PROGRAMAÇÃO POR CAIXAS <---
+      // Distribuição de programação
       let progBoxesCount = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Programação")).length;
       let distributedProgramacao = [];
       
@@ -326,8 +328,33 @@ var createSketch = function (dna) {
         let progText = userData.programacao[0] || "";
         let lines = progText.split(/\n/).map(l => l.trim()).filter(l => l !== "");
         
+        let days = [];
+        let currentDay = [];
+        
+        for (let line of lines) {
+           let upper = line.toUpperCase();
+           if ((upper === line && line.length > 3 && !line.includes("H") && !line.match(/^\d/)) || upper.match(/^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/)) {
+               if(currentDay.length > 0) days.push(currentDay.join('\n'));
+               currentDay = [line];
+           } else {
+               currentDay.push(line);
+           }
+        }
+        if (currentDay.length > 0) days.push(currentDay.join('\n'));
+
         if (progBoxesCount === 1) {
-           distributedProgramacao = [lines.join('\n')]; 
+           distributedProgramacao = [progText]; 
+        } else if (days.length > 1) {
+           let chunks = Array.from({length: progBoxesCount}, () => []);
+           let base = Math.floor(days.length / progBoxesCount);
+           let remainder = days.length % progBoxesCount;
+           let idx = 0;
+           for (let i = 0; i < progBoxesCount; i++) {
+              let count = base + (i < remainder ? 1 : 0);
+              chunks[i] = days.slice(idx, idx + count);
+              idx += count;
+           }
+           distributedProgramacao = chunks.map(c => c.join('\n\n'));
         } else {
            let chunks = Array.from({length: progBoxesCount}, () => []);
            let base = Math.floor(lines.length / progBoxesCount);
@@ -380,7 +407,7 @@ var createSketch = function (dna) {
         }
       }
 
-      // PASSO 3: Textos (com Programação Distribuída)
+      // PASSO 3: Textos
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
@@ -464,6 +491,7 @@ var createSketch = function (dna) {
           sketch.text("Falta Foto!", x + w / 2, y + h / 2);
         }
       } else if (label.includes("Patrocínios")) {
+        // Se a input for 0 ou não houver imagens, este bloco nunca chega a ser executado
         if (conteudoDinamico && conteudoDinamico.length > 0) {
           drawSponsorsFlex(conteudoDinamico, x, y, w, h);
         }
@@ -537,6 +565,7 @@ var createSketch = function (dna) {
       return { rows: rows, totalHeight: totalHeight, rowHeight: targetH };
     }
 
+    // --- FUNÇÕES DE TEXTO E DESENHO ---
     function getWrappedTextHeight(txt, boxWidth) {
       let paragraphs = txt.split('\n');
       let totalHeight = 0;
@@ -666,6 +695,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
+  // If all inputs are empty, call the LLM to generate them
   if (!inputLocalidade && !inputDia && !inputPrograma) {
     container.style.display = "block";
     container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A consultar a comissão de festas (LLM)... 🤖</h3>";
@@ -679,6 +709,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       }
       const data = await response.json();
       
+      // Auto-fill the HTML inputs so the user can see/edit the generated text
       document.getElementById("promptInputLocalidade").value = data.nomeTerrinha || "";
       document.getElementById("promptInputDia").value = data.dataEvento || "";
       document.getElementById("promptPrograma").value = data.programacao || "";
@@ -691,6 +722,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     }
   }
 
+  // Exibir a mensagem de carregamento
   container.style.display = "block";
   container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
   
