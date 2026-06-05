@@ -182,7 +182,7 @@ var createSketch = function (dna) {
 
       userData.artistas = sketch.shuffle(imagensArtistas.slice());
 
-      // ---> CORREÇÃO DO ID PARA LER A TUA INPUT DO HTML <---
+      // ---> LÓGICA RESTRITA E EXATA PARA QUANTIDADE DE PATROCINADORES <---
       let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
       let numLogos = 3; 
@@ -195,8 +195,10 @@ var createSketch = function (dna) {
       userData.patrociniosImagens = [];
       if (logos.length > 0 && numLogos > 0) {
         let shuffledLogos = sketch.shuffle(logos.slice());
-        for (let i = 0; i < numLogos; i++) {
-          userData.patrociniosImagens.push(shuffledLogos[i % shuffledLogos.length]);
+        // NOVO: Limita o número exato sem nunca repetir imagens (mesmo se pedir 30, mas só houver 21)
+        let totalValido = sketch.min(numLogos, shuffledLogos.length);
+        for (let i = 0; i < totalValido; i++) {
+          userData.patrociniosImagens.push(shuffledLogos[i]);
         }
       }
 
@@ -212,7 +214,8 @@ var createSketch = function (dna) {
         };
       }
 
-      selectedTemplate = [...templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result];
+      // Clone Profundo do Template: Garante que as alterações de altura não quebram futuras gerações
+      selectedTemplate = JSON.parse(JSON.stringify(templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result));
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
 
@@ -252,7 +255,7 @@ var createSketch = function (dna) {
       const [bgA, bgB] = paletaAtiva.gradient;
       _drawGradientBackground(bgA, bgB);
 
-      // ---> LÓGICA DE LIMPEZA E CRIAÇÃO DINÂMICA DA ZONA DE PATROCÍNIOS <---
+      // ---> DETEÇÃO DA MELHOR ZONA PARA OS PATROCINADORES <---
       let filteredTemplate = [];
       let lowestElementY = 0;
       let allSponsorBoxes = [];
@@ -263,9 +266,10 @@ var createSketch = function (dna) {
         
         if (!label.includes("Patrocínios")) {
           filteredTemplate.push(box); 
-          let boxBottom = box.value.y + box.value.height;
-          if (boxBottom > lowestElementY) {
-            lowestElementY = boxBottom;
+          // O Santo ocupa a área toda, logo não conta para o limite inferior dos elementos de informação
+          if (!label.includes("Sant@ (Figura)")) {
+             let boxBottom = box.value.y + box.value.height;
+             if (boxBottom > lowestElementY) lowestElementY = boxBottom;
           }
         } else {
           allSponsorBoxes.push(box);
@@ -274,7 +278,6 @@ var createSketch = function (dna) {
 
       let finalSponsorBox = null;
       if (allSponsorBoxes.length > 0) {
-        // Encontra a caixa com maior área (ignora anotações pequenas erradas do JSON)
         finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
           let prevArea = prev.value.width * prev.value.height;
           let currArea = current.value.width * current.value.height;
@@ -286,15 +289,27 @@ var createSketch = function (dna) {
         if (startY > 90) startY = 88; 
         
         finalSponsorBox = {
-          value: {
-            x: 5,
-            y: startY,
-            width: 90,
-            height: 97 - startY,
-            rectanglelabels: ["Patrocínios"]
-          }
+          value: { x: 5, y: startY, width: 90, height: 97 - startY, rectanglelabels: ["Patrocínios"] }
         };
         filteredTemplate.push(finalSponsorBox);
+      }
+
+      // ---> SISTEMA ANTI-COLISÃO (Cortar a Programação) <---
+      if (finalSponsorBox) {
+        let sponsorTop = finalSponsorBox.value.y;
+        for (let box of filteredTemplate) {
+          if (box !== finalSponsorBox) {
+            let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+            // A imagem do Santo (fundo) é a única que não é cortada
+            if (!label.includes("Sant@ (Figura)")) {
+              let boxBottom = box.value.y + box.value.height;
+              // Se a caixa de texto tocar na zona dos patrocinadores, cortamo-la!
+              if (boxBottom > sponsorTop) {
+                 box.value.height = Math.max(2, sponsorTop - box.value.y - 1);
+              }
+            }
+          }
+        }
       }
 
       selectedTemplate = filteredTemplate;
@@ -303,8 +318,33 @@ var createSketch = function (dna) {
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
       numToRender = sketch.min(numToRender, userData.artistas.length);
 
+      // ---> DISTRIBUIÇÃO INTELIGENTE DA PROGRAMAÇÃO POR CAIXAS <---
+      let progBoxesCount = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Programação")).length;
+      let distributedProgramacao = [];
+      
+      if (progBoxesCount > 0) {
+        let progText = userData.programacao[0] || "";
+        let lines = progText.split(/\n/).map(l => l.trim()).filter(l => l !== "");
+        
+        if (progBoxesCount === 1) {
+           distributedProgramacao = [lines.join('\n')]; 
+        } else {
+           let chunks = Array.from({length: progBoxesCount}, () => []);
+           let base = Math.floor(lines.length / progBoxesCount);
+           let remainder = lines.length % progBoxesCount;
+           let idx = 0;
+           for (let i = 0; i < progBoxesCount; i++) {
+              let count = base + (i < remainder ? 1 : 0);
+              chunks[i] = lines.slice(idx, idx + count);
+              idx += count;
+           }
+           distributedProgramacao = chunks.map(c => c.join('\n'));
+        }
+      }
+
       let textIndex = 0;
       let currentArtistBoxIndex = 0;
+      let currentProgBoxIndex = 0;
 
       // PASSO 1: Fundo e Santo
       for (let box of selectedTemplate) {
@@ -334,11 +374,13 @@ var createSketch = function (dna) {
           }
           currentArtistBoxIndex++;
         } else if (label.includes("Patrocínios")) {
-          renderContent(label, px, py, pWidth, pHeight, userData.patrociniosImagens, 1.0);
+          if (box === finalSponsorBox) {
+            renderContent(label, px, py, pWidth, pHeight, userData.patrociniosImagens, 1.0);
+          }
         }
       }
 
-      // PASSO 3: Textos
+      // PASSO 3: Textos (com Programação Distribuída)
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
@@ -347,7 +389,13 @@ var createSketch = function (dna) {
         let pHeight = sketch.map(box.value.height, 0, 100, 0, sketch.height);
 
         if (label.includes("Nome da Terrinha") || label.includes("Data do Evento") || label.includes("Local") || label.includes("Programação")) {
-          let conteudoDinamico = label.includes("Programação") ? userData.programacao[0] : "";
+          let conteudoDinamico = "";
+          
+          if (label.includes("Programação")) {
+             conteudoDinamico = distributedProgramacao[currentProgBoxIndex] || "";
+             currentProgBoxIndex++;
+          }
+          
           let scale = dna.textScales[textIndex % dna.textScales.length];
           renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, scale);
           textIndex++;
@@ -417,13 +465,11 @@ var createSketch = function (dna) {
         }
       } else if (label.includes("Patrocínios")) {
         if (conteudoDinamico && conteudoDinamico.length > 0) {
-          // Totalmente orgânico! Sem fundo.
           drawSponsorsFlex(conteudoDinamico, x, y, w, h);
         }
       }
     }
 
-    // ---> ALGORITMO FLEXBOX PARA PATROCÍNIOS <---
     function drawSponsorsFlex(logosArray, bx, by, bw, bh) {
       if (!logosArray || logosArray.length === 0) return;
 
@@ -491,7 +537,6 @@ var createSketch = function (dna) {
       return { rows: rows, totalHeight: totalHeight, rowHeight: targetH };
     }
 
-    // --- FUNÇÕES DE TEXTO E DESENHO ---
     function getWrappedTextHeight(txt, boxWidth) {
       let paragraphs = txt.split('\n');
       let totalHeight = 0;
@@ -621,7 +666,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
-  // If all inputs are empty, call the LLM to generate them
   if (!inputLocalidade && !inputDia && !inputPrograma) {
     container.style.display = "block";
     container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A consultar a comissão de festas (LLM)... 🤖</h3>";
@@ -635,7 +679,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       }
       const data = await response.json();
       
-      // Auto-fill the HTML inputs so the user can see/edit the generated text
       document.getElementById("promptInputLocalidade").value = data.nomeTerrinha || "";
       document.getElementById("promptInputDia").value = data.dataEvento || "";
       document.getElementById("promptPrograma").value = data.programacao || "";
@@ -648,7 +691,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     }
   }
 
-  // Exibir a mensagem de carregamento
   container.style.display = "block";
   container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
   

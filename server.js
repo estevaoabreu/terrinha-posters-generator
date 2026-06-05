@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const { removeBackground } = require("@imgly/background-removal-node");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
@@ -64,6 +65,45 @@ app.get("/api/images", (req, res) => {
     res.json({ artistas, logos });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/api/generate-text", async (req, res) => {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY não está definida no ficheiro .env");
+
+    // Iniciar o Gemini (usamos o modelo flash porque é rápido e tem plano gratuito generoso)
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // O "Prompt" secreto que instrui a IA a ser engraçada e devolver JSON perfeito
+    const prompt = `
+      Gera dados falsos para um cartaz de uma típica "Festa da Terrinha" portuguesa (arraial/festa de aldeia).
+      Seja criativo e engraçado nos nomes.
+      Responde EXCLUSIVAMENTE num formato JSON válido com as seguintes chaves (sem formatação markdown):
+      {
+        "nomeTerrinha": "Nome inventado da aldeia (ex: Festa de Nossa Sr.ª da Tosse)",
+        "dataEvento": "Uma data típica de verão (ex: 12 a 15 de Agosto)",
+        "programacao": "Um pequeno programa de festas. Usa OBRIGATORIAMENTE a tag exata {ARTISTAS} no dia principal da festa para o concerto musical."
+      }
+      
+      Exemplo do campo programacao:
+      "SEXTA:\\n21h - Abertura do Bar\\n23h - Baile com {ARTISTAS}\\n\\nSÁBADO:\\n15h - Missa Solene\\n22h - Fogo de Artifício"
+    `;
+
+    const result = await model.generateContent(prompt);
+    let text = result.response.text();
+    
+    // Limpar formatação markdown (```json ... ```) caso o Gemini a inclua
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    const data = JSON.parse(text);
+    res.json(data);
+
+  } catch (error) {
+    console.error("Erro na API do Gemini:", error);
+    res.status(500).json({ error: "Erro ao gerar texto criativo." });
   }
 });
 
