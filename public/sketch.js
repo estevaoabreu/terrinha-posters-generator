@@ -18,7 +18,6 @@ fetch("posicoes.json")
   })
   .catch(err => console.error("Erro ao carregar posicoes.json:", err));
 
-<<<<<<< Updated upstream
 class PosterDNA {
   constructor(templateIdx, titleFont, bodyFont, numArtists, textScales) {
     if (templateIdx !== undefined) {
@@ -31,198 +30,14 @@ class PosterDNA {
       this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
       this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
-      // Number of unique artists to use (1 to 5)
       this.numArtists = Math.floor(Math.random() * 5) + 1;
       this.textScales = [];
       for (let i = 0; i < 5; i++) {
-        this.textScales.push(Math.random() * 0.4 + 0.6); // 0.6 to 1.0
-=======
-  let selectedTitleFont;
-  let selectedBodyFont;
-  let paletaAtiva = null;
-
-  let userData = {
-    nomeTerrinha: "FESTAS DE SÃO JOÃO",
-    dataEvento: "23 A 25 DE JUNHO",
-    local: "Largo da Igreja, Ribeira",
-    programacao: [
-      "SEXTA:\n22h - Quim Barreiros",
-      "SÁBADO:\n21h - Banda Pimba\n23h - Fogo de Artifício",
-      "DOMINGO:\n15h - Missa",
-    ],
-    patrocinios: "Café Central | Talho do Zé | Junta de Freguesia",
-    artistas: [],
-    patrociniosImagens: []
-  };
-
-  sketch.preload = function () {
-    templatesDB = sketch.loadJSON("posicoes.json");
-
-    for (let nome of dynamicImagesConfig.artistas) {
-      imagensArtistas.push(sketch.loadImage("artistas/" + nome));
-    }
-
-    if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
-      for (let nome of dynamicImagesConfig.logos) {
-        logos.push(sketch.loadImage("patrocinios/" + nome));
-      }
-    } else {
-      for (let i = 1; i <= 21; i++) {
-        logos.push(sketch.loadImage("patrocinios/p" + i + ".png"));
-      }
-    }
-
-    let storedSaintImage = localStorage.getItem("selectedSaintImage");
-    if (storedSaintImage) {
-      saintImage = sketch.loadImage(storedSaintImage);
-    }
-  };
-
-  sketch.setup = function () {
-    sketch.createCanvas(600, 850);
-
-    let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
-    if (inputLocalidade) userData.nomeTerrinha = inputLocalidade.toUpperCase();
-
-    let inputDia = document.getElementById("promptInputDia")?.value?.trim();
-    if (inputDia) userData.dataEvento = inputDia;
-
-    let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
-    if (inputPrograma) {
-      userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
-    }
-
-    userData.artistas = sketch.shuffle(imagensArtistas.slice());
-
-    // Leitura robusta do número de logos pedido pelo utilizador
-    let inputNumLogosEl = document.getElementById("promptNúmeroLogos");
-    let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
-    let numLogos = 3; // Valor padrão
-    if (inputNumLogos && inputNumLogos.trim() !== "") {
-      let parsedNum = parseInt(inputNumLogos, 10);
-      if (!isNaN(parsedNum)) numLogos = parsedNum;
-    }
-    
-    // Aloca as imagens baseando-se ESPECIFICAMENTE na quantidade pedida, 
-    // repetindo ou cortando conforme estritamente necessário.
-    userData.patrociniosImagens = [];
-    if (logos.length > 0 && numLogos > 0) {
-      let shuffledLogos = sketch.shuffle(logos.slice());
-      for (let i = 0; i < numLogos; i++) {
-        userData.patrociniosImagens.push(shuffledLogos[i % shuffledLogos.length]);
-      }
-    }
-
-    if (typeof resolverPaleta === "function") {
-      paletaAtiva = resolverPaleta(inputLocalidade || null);
-      if (typeof aplicarGradienteFundo === "function") {
-        aplicarGradienteFundo(inputLocalidade || null);
-      }
-    } else {
-      paletaAtiva = {
-        gradient: ["#140028", "#2E0052"],
-        text: ["#FFD700", "#FFFFFF"],
-      };
-    }
-
-    let templatesArray = Object.values(templatesDB);
-    let randomIndex = sketch.floor(sketch.random(templatesArray.length));
-    
-    // Clonamos o array do template para evitar mutar o JSON original carregado
-    selectedTemplate = [...templatesArray[randomIndex].annotations[0].result];
-
-    selectedTitleFont = sketch.random(titleFonts);
-    selectedBodyFont = sketch.random(bodyFonts);
-
-    sketch.noLoop();
-
-    if (document.fonts) {
-      document.fonts.ready.then(() => {
-        sketch.redraw();
-      });
-    }
-  };
-
-  sketch.draw = function () {
-    saintDrawn = false;
-    const [bgA, bgB] = paletaAtiva.gradient;
-    _drawGradientBackground(bgA, bgB);
-
-    let allSponsorBoxes = [];
-    let lowestElementY = 0;
-
-    // Localizar todas as caixas de patrocínios e a altura máxima ocupada
-    for (let box of selectedTemplate) {
-      let rawLabel = box.value.rectanglelabels[0];
-      let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
-      
-      let boxBottom = box.value.y + box.value.height;
-      if (boxBottom > lowestElementY) lowestElementY = boxBottom;
-
-      if (label.includes("Patrocínios")) {
-        allSponsorBoxes.push(box);
-      }
-    }
-
-    let finalSponsorBox = null;
-
-    if (allSponsorBoxes.length > 0) {
-      // INTELIGÊNCIA: Se houver várias caixas sobrepostas de patrocínios no JSON, 
-      // escolhe apenas a MAIOR, ignorando anotações erradas/pequenas.
-      finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
-        let prevArea = prev.value.width * prev.value.height;
-        let currArea = current.value.width * current.value.height;
-        return (currArea > prevArea) ? current : prev;
-      });
-    } else if (userData.patrociniosImagens.length > 0) {
-      // Fallback: Se o layout não tiver caixa nenhuma, criamos uma na base
-      let startY = Math.max(lowestElementY + 2, 85); 
-      if (startY > 92) startY = 90; 
-
-      finalSponsorBox = {
-        value: {
-          x: 5,
-          y: startY,
-          width: 90,
-          height: 98 - startY,
-          rectanglelabels: ["Patrocínios"]
-        }
-      };
-      selectedTemplate.push(finalSponsorBox);
-    }
-
-    let indiceArtista = 0;
-    let indiceProgramacao = 0;
-
-    for (let box of selectedTemplate) {
-      let rawLabel = box.value.rectanglelabels[0];
-      let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
-
-      let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
-      let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
-      let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
-      let pHeight = sketch.map(box.value.height, 0, 100, 0, sketch.height);
-
-      let conteudoDinamico = "";
-
-      if (label.includes("Artista (Imagem)")) {
-        if (userData.artistas.length > 0) {
-          conteudoDinamico = userData.artistas[indiceArtista % userData.artistas.length];
-        }
-        indiceArtista++;
-      } else if (label.includes("Programação")) {
-        conteudoDinamico = userData.programacao[indiceProgramacao % userData.programacao.length];
-        indiceProgramacao++;
-      } else if (label.includes("Patrocínios")) {
-        // Ignora qualquer caixa extra, só alimenta a caixa principal (Flexbox)
-        if (box !== finalSponsorBox) continue; 
-        conteudoDinamico = userData.patrociniosImagens;
->>>>>>> Stashed changes
+        this.textScales.push(Math.random() * 0.4 + 0.6); 
       }
     }
   }
 
-<<<<<<< Updated upstream
   crossover(partner) {
     let child = new PosterDNA();
     child.templateIdx = Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
@@ -265,7 +80,7 @@ class Population {
   constructor(size) {
     this.individuals = [];
     this.size = size;
-    this.eliteIndex = -1; // -1 means none selected
+    this.eliteIndex = -1; 
   }
 
   initialize() {
@@ -283,31 +98,25 @@ class Population {
     if (this.eliteIndex >= 0 && this.eliteIndex < this.size) {
       eliteDNA = this.individuals[this.eliteIndex].getCopy();
     } else {
-      // If user didn't pick an elite, we fallback to picking the first one
       eliteDNA = this.individuals[0].getCopy();
     }
 
-    // Elitism: carry over the chosen poster
     newGeneration.push(eliteDNA);
 
-    // Fill the rest by crossover and mutation from the elite 
     for (let i = 1; i < this.size; i++) {
       let partner = new PosterDNA();
       let child = eliteDNA.crossover(partner);
-      child.mutate(0.3); // 30% mutation chance per gene
+      child.mutate(0.3); 
       newGeneration.push(child);
     }
 
     this.individuals = newGeneration;
-    
-    // As the new generation is drawn, the elite is at index 0. 
     this.eliteIndex = 0; 
   }
 }
 
 let globalPopulation = new Population(6);
 
-// Sketch generator function factory
 var createSketch = function (dna) {
   return function (sketch) {
     let selectedTemplate;
@@ -330,19 +139,8 @@ var createSketch = function (dna) {
         "SÁBADO:\n21h - Banda Pimba\n23h - Fogo de Artifício",
         "DOMINGO:\n15h - Missa",
       ],
-      patrocinios: "Café Central | Talho do Zé | Junta de Freguesia",
       artistas: [],
-=======
-  function _drawGradientBackground(corA, corB) {
-    const toRGB = (cssColor) => {
-      const el = document.createElement("div");
-      el.style.color = cssColor;
-      document.body.appendChild(el);
-      const computed = getComputedStyle(el).color;
-      document.body.removeChild(el);
-      const m = computed.match(/\d+/g);
-      return m ? m.map(Number) : [0, 0, 0];
->>>>>>> Stashed changes
+      patrociniosImagens: []
     };
 
     sketch.preload = function () {
@@ -350,8 +148,14 @@ var createSketch = function (dna) {
         imagensArtistas.push(sketch.loadImage("artistas/" + nome));
       }
 
-      for (let nome of dynamicImagesConfig.logos) {
-        logos.push(sketch.loadImage("logos/" + nome));
+      if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
+        for (let nome of dynamicImagesConfig.logos) {
+          logos.push(sketch.loadImage("patrocinios/" + nome));
+        }
+      } else {
+        for (let i = 1; i <= 21; i++) {
+          logos.push(sketch.loadImage("patrocinios/p" + i + ".png"));
+        }
       }
 
       let storedSaintImage = localStorage.getItem("selectedSaintImage");
@@ -363,24 +167,36 @@ var createSketch = function (dna) {
     sketch.setup = function () {
       sketch.createCanvas(600, 850);
 
-      let inputLocalidade = document
-        .getElementById("promptInputLocalidade")
-        ?.value?.trim();
+      let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
       if (inputLocalidade) userData.nomeTerrinha = inputLocalidade.toUpperCase();
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
       if (inputDia) userData.dataEvento = inputDia;
 
-      let inputPrograma = document
-        .getElementById("promptPrograma")
-        ?.value?.trim();
+      let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
       if (inputPrograma) {
         userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
       }
 
-      // We shuffle all dynamic images and keep them in userData.artistas
-      // The rendering logic will only use up to dna.numArtists of them, WITHOUT repeating.
       userData.artistas = sketch.shuffle(imagensArtistas.slice());
+
+      // ---> CORREÇÃO DO ID PARA LER A TUA INPUT DO HTML <---
+      let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
+      let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
+      let numLogos = 3; 
+      
+      if (inputNumLogos && inputNumLogos.trim() !== "") {
+        let parsedNum = parseInt(inputNumLogos, 10);
+        if (!isNaN(parsedNum)) numLogos = parsedNum;
+      }
+      
+      userData.patrociniosImagens = [];
+      if (logos.length > 0 && numLogos > 0) {
+        let shuffledLogos = sketch.shuffle(logos.slice());
+        for (let i = 0; i < numLogos; i++) {
+          userData.patrociniosImagens.push(shuffledLogos[i % shuffledLogos.length]);
+        }
+      }
 
       if (typeof resolverPaleta === "function") {
         paletaAtiva = resolverPaleta(inputLocalidade || null);
@@ -393,10 +209,8 @@ var createSketch = function (dna) {
           text: ["#FFD700", "#FFFFFF"],
         };
       }
-<<<<<<< Updated upstream
 
-      // Assign DNA genes
-      selectedTemplate = templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result;
+      selectedTemplate = [...templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result];
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
 
@@ -414,16 +228,61 @@ var createSketch = function (dna) {
       const [bgA, bgB] = paletaAtiva.gradient;
       _drawGradientBackground(bgA, bgB);
 
-      // Pre-calculate the maximum artists we can draw without repetition
+      // ---> LÓGICA DE LIMPEZA E CRIAÇÃO DINÂMICA DA ZONA DE PATROCÍNIOS <---
+      let filteredTemplate = [];
+      let lowestElementY = 0;
+      let allSponsorBoxes = [];
+
+      for (let box of selectedTemplate) {
+        let rawLabel = box.value.rectanglelabels[0];
+        let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+        
+        if (!label.includes("Patrocínios")) {
+          filteredTemplate.push(box); 
+          let boxBottom = box.value.y + box.value.height;
+          if (boxBottom > lowestElementY) {
+            lowestElementY = boxBottom;
+          }
+        } else {
+          allSponsorBoxes.push(box);
+        }
+      }
+
+      let finalSponsorBox = null;
+      if (allSponsorBoxes.length > 0) {
+        // Encontra a caixa com maior área (ignora anotações pequenas erradas do JSON)
+        finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
+          let prevArea = prev.value.width * prev.value.height;
+          let currArea = current.value.width * current.value.height;
+          return (currArea > prevArea) ? current : prev;
+        });
+        filteredTemplate.push(finalSponsorBox);
+      } else if (userData.patrociniosImagens.length > 0) {
+        let startY = Math.max(lowestElementY + 2, 80); 
+        if (startY > 90) startY = 88; 
+        
+        finalSponsorBox = {
+          value: {
+            x: 5,
+            y: startY,
+            width: 90,
+            height: 97 - startY,
+            rectanglelabels: ["Patrocínios"]
+          }
+        };
+        filteredTemplate.push(finalSponsorBox);
+      }
+
+      selectedTemplate = filteredTemplate;
+
       let artistBoxesCount = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Artista (Imagem)")).length;
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
-      // Ensure we don't draw more artists than we actually have images for
       numToRender = sketch.min(numToRender, userData.artistas.length);
 
       let textIndex = 0;
       let currentArtistBoxIndex = 0;
 
-      // PASS 1: Saint Background
+      // PASSO 1: Fundo e Santo
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
@@ -436,7 +295,7 @@ var createSketch = function (dna) {
         }
       }
 
-      // PASS 2: Artist Images & Patrocínios
+      // PASSO 2: Artistas & Patrocínios
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
@@ -451,11 +310,11 @@ var createSketch = function (dna) {
           }
           currentArtistBoxIndex++;
         } else if (label.includes("Patrocínios")) {
-          renderContent(label, px, py, pWidth, pHeight, "", 1.0);
+          renderContent(label, px, py, pWidth, pHeight, userData.patrociniosImagens, 1.0);
         }
       }
 
-      // PASS 3: Texts (always on top)
+      // PASSO 3: Textos
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
@@ -526,8 +385,6 @@ var createSketch = function (dna) {
         if (conteudoDinamico) {
           drawImageCover(conteudoDinamico, x, y, w, h);
         } else {
-          // Fallback box won't be drawn anymore due to rendering logic skipping it, 
-          // but kept here for safety.
           sketch.fill(255, 50, 100, 80);
           sketch.rect(x, y, w, h, 5);
           sketch.fill(255);
@@ -535,13 +392,82 @@ var createSketch = function (dna) {
           sketch.text("Falta Foto!", x + w / 2, y + h / 2);
         }
       } else if (label.includes("Patrocínios")) {
-        sketch.fill(255);
-        sketch.rect(x, y, w, h);
-        sketch.fill(0);
-        drawTextFitted("COM O APOIO DE:\n" + userData.patrocinios, x, y, w, h, sketch.NORMAL, scale);
+        if (conteudoDinamico && conteudoDinamico.length > 0) {
+          // Totalmente orgânico! Sem fundo.
+          drawSponsorsFlex(conteudoDinamico, x, y, w, h);
+        }
       }
     }
 
+    // ---> ALGORITMO FLEXBOX PARA PATROCÍNIOS <---
+    function drawSponsorsFlex(logosArray, bx, by, bw, bh) {
+      if (!logosArray || logosArray.length === 0) return;
+
+      let gap = 15; 
+      let n = logosArray.length;
+      
+      let lowH = 10; 
+      let highH = bh;
+      let bestLayout = null;
+      let iterations = 30; 
+      
+      while (iterations-- > 0) {
+        let midH = (lowH + highH) / 2;
+        let layout = testFlexLayout(logosArray, bw, midH, gap);
+        
+        if (layout.totalHeight <= bh) {
+          bestLayout = layout; 
+          lowH = midH; 
+        } else {
+          highH = midH; 
+        }
+      }
+      
+      if (!bestLayout) {
+        bestLayout = testFlexLayout(logosArray, bw, 15, gap); 
+      }
+
+      let startY = by + (bh - bestLayout.totalHeight) / 2;
+      
+      for (let row of bestLayout.rows) {
+        let startX = bx + (bw - row.width) / 2; 
+        let currentX = startX;
+        
+        for (let item of row.items) {
+          drawImageContain(item.img, currentX, startY, item.w, item.h);
+          currentX += item.w + gap;
+        }
+        startY += bestLayout.rowHeight + gap;
+      }
+    }
+
+    function testFlexLayout(logosArray, maxW, targetH, gap) {
+      let rows = [];
+      let currentRow = { width: 0, items: [] };
+      
+      for (let img of logosArray) {
+        let aspect = (img && img.width > 0 && img.height > 0) ? img.width / img.height : 1;
+        let logoW = targetH * aspect; 
+        
+        if (currentRow.width + logoW > maxW && currentRow.items.length > 0) {
+          rows.push(currentRow);
+          currentRow = { width: 0, items: [] };
+        }
+        
+        currentRow.items.push({ img: img, w: logoW, h: targetH });
+        currentRow.width += logoW + gap;
+      }
+      if (currentRow.items.length > 0) {
+        rows.push(currentRow);
+      }
+      
+      for (let r of rows) r.width -= gap; 
+      
+      let totalHeight = rows.length * targetH + (rows.length - 1) * gap;
+      return { rows: rows, totalHeight: totalHeight, rowHeight: targetH };
+    }
+
+    // --- FUNÇÕES DE TEXTO E DESENHO ---
     function getWrappedTextHeight(txt, boxWidth) {
       let paragraphs = txt.split('\n');
       let totalHeight = 0;
@@ -555,7 +481,7 @@ var createSketch = function (dna) {
         for (let i = 0; i < words.length; i++) {
           let wordWidth = sketch.textWidth(words[i]);
           if (wordWidth > boxWidth) {
-             return Infinity; // This font size is invalid, a single word is too wide
+             return Infinity; 
           }
 
           let testLine = currentLine + words[i] + " ";
@@ -574,59 +500,14 @@ var createSketch = function (dna) {
     function drawTextFitted(txt, x, y, w, h, style, scaleMultiplier = 1.0) {
       sketch.push();
       sketch.textStyle(style);
-      // We align text vertically and horizontally within the bounding box
       sketch.textAlign(sketch.CENTER, sketch.CENTER);
-=======
-    } else if (label.includes("Patrocínios")) {
-      if (conteudoDinamico && conteudoDinamico.length > 0) {
-        drawSponsorsGrid(conteudoDinamico, x, y, w, h);
-      }
-    }
-  }
-
-  function drawSponsorsGrid(logosArray, bx, by, bw, bh) {
-    if (!logosArray || logosArray.length === 0) return;
-
-    let n = logosArray.length;
-    let gap = 10; 
-
-    // O algoritmo calcula o número ideal de colunas e linhas
-    let aspectBox = bw / bh;
-    let cols = sketch.ceil(sketch.sqrt(n * aspectBox));
-    let rows = sketch.ceil(n / cols);
-
-    while (cols * rows < n) {
-      cols++;
-      rows = sketch.ceil(n / cols);
-    }
-
-    // Calcula o espaço real que cada item pode ocupar na grelha sem se deformar
-    let cellW = (bw - gap * (cols - 1)) / cols;
-    let cellH = (bh - gap * (rows - 1)) / rows;
-
-    for (let i = 0; i < n; i++) {
-      let col = i % cols;
-      let row = sketch.floor(i / cols);
-
-      let cx = bx + col * (cellW + gap);
-      let cy = by + row * (cellH + gap);
-
-      let img = logosArray[i];
-      if (img && img.width > 0 && img.height > 0) {
-        drawImageContain(img, cx, cy, cellW, cellH);
-      }
-    }
-  }
->>>>>>> Stashed changes
 
       let minSize = 10;
       let maxSize = 200;
       let optimalSize = minSize;
-
       let low = minSize;
       let high = maxSize;
 
-      // Safe boundaries to avoid pixel-edge overflow issues
       let safeW = w * 0.95;
       let safeH = h * 0.95;
 
@@ -642,13 +523,10 @@ var createSketch = function (dna) {
         }
       }
 
-      // Apply the dynamic scale multiplier from the DNA
       optimalSize = optimalSize * scaleMultiplier;
-      if (optimalSize < 5) optimalSize = 5; // Safeguard
+      if (optimalSize < 5) optimalSize = 5; 
       
       sketch.textSize(optimalSize);
-      
-      // By passing width and height, p5.js automatically wraps the text
       sketch.text(txt, x, y, w, h);
       sketch.pop();
     }
@@ -708,7 +586,6 @@ function selectElite(index) {
 }
 
 document.getElementById("generateBtn").addEventListener("click", () => {
-<<<<<<< Updated upstream
   if (templatesArrayGlobal.length === 0) {
     alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
     return;
@@ -716,18 +593,15 @@ document.getElementById("generateBtn").addEventListener("click", () => {
 
   const container = document.getElementById("sketch");
   
-  // Exibir a mensagem de carregamento
   container.style.display = "block";
   container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
   
   const exportBtn = document.getElementById('exportBtn');
   if (exportBtn) exportBtn.style.display = 'none';
 
-  // Timeout para permitir a renderização da UI de loading
   setTimeout(() => {
     container.innerHTML = "";
     
-    // Configurar grid para 6 cartazes
     container.style.display = "grid";
     container.style.gridTemplateColumns = "repeat(3, 1fr)";
     container.style.gap = "15px";
@@ -740,7 +614,6 @@ document.getElementById("generateBtn").addEventListener("click", () => {
       globalPopulation.evolve();
     }
 
-    // Gerar 6 cartazes em miniatura
     for (let i = 0; i < globalPopulation.size; i++) {
       const div = document.createElement("div");
       div.id = "poster-mini-" + i;
@@ -756,7 +629,6 @@ document.getElementById("generateBtn").addEventListener("click", () => {
       new p5(createSketch(globalPopulation.individuals[i]), div.id);
     }
 
-    // Auto-selecionar o elite na interface caso já exista
     if (globalPopulation.eliteIndex >= 0) {
       setTimeout(() => {
         selectElite(globalPopulation.eliteIndex);
@@ -766,7 +638,6 @@ document.getElementById("generateBtn").addEventListener("click", () => {
       if (exportBtn) exportBtn.style.display = 'block';
     }
 
-    // Adicionar CSS para o highlight idêntico ao dos santos, mas para os cartazes
     if (!document.getElementById("miniature-style")) {
       const style = document.createElement("style");
       style.id = "miniature-style";
@@ -807,7 +678,6 @@ document.getElementById("generateBtn").addEventListener("click", () => {
   }, 50);
 });
 
-// Listener para exportar o cartaz
 document.getElementById("exportBtn")?.addEventListener("click", () => {
   if (globalPopulation.eliteIndex >= 0) {
     const selectedCanvas = document.querySelector(`#poster-mini-${globalPopulation.eliteIndex} canvas`);
@@ -821,8 +691,3 @@ document.getElementById("exportBtn")?.addEventListener("click", () => {
     alert("Por favor, selecione um cartaz para exportar.");
   }
 });
-=======
-  document.getElementById("sketch").innerHTML = "";
-  let posterSketch = new p5(sketch, "sketch");
-});
->>>>>>> Stashed changes
