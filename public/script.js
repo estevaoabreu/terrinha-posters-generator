@@ -14,6 +14,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     imgElements.forEach((img) => {
       img.style.display = "none";
       img.src = "";
+      img.alt = "";
     });
 
     for (let i = 0; i < imgElements.length; i++) {
@@ -39,6 +40,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
       if (result.success && result.images && result.images[0]) {
         imgElements[i].src = `data:image/png;base64,${result.images[0]}`;
+        imgElements[i].alt = `Imagem ${i + 1}`;
         imgElements[i].style.display = "block";
       } else {
         console.error(`Erro ao gerar a imagem ${i + 1}`);

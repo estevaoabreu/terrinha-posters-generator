@@ -73,6 +73,9 @@
             [ Preenche o formulário e clica em<br>"🖨️ GERAR CARTAZ" para começar ]
           </p>
           <div id="sketch"></div>
+          <button id="exportBtn" type="button" class="botao-gerar" style="display: none; margin-top: 20px; background: linear-gradient(to bottom, #44ff44, #008800) !important; width: 80%;">
+            💾 EXPORTAR SELECIONADO
+          </button>
         </div>
       </div>
 
@@ -83,14 +86,11 @@
     <script>
       // Botão X: apaga o cartaz gerado, restaura o placeholder
       document.getElementById('closePreviewBtn').addEventListener('click', () => {
-        const canvas = document.querySelector('#sketch canvas');
-        if (canvas) {
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.fillStyle = '#111111';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-        }
+        const sketchContainer = document.getElementById('sketch');
+        sketchContainer.innerHTML = '';
+        sketchContainer.style.display = 'flex'; // restore original display just in case
         document.getElementById('previewPlaceholder').style.display = 'block';
+        document.getElementById('exportBtn').style.display = 'none';
       });
 
       // Esconde o placeholder quando o cartaz começa a ser gerado
