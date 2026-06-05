@@ -11,63 +11,93 @@
   <body>
 
     <div class="marquee-bar">
-      <marquee scrollamount="12">
-        🎨 CRIA O TEU CARTAZ! 🎨 &nbsp;&nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp;&nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp;&nbsp; 🎨 CRIA O TEU CARTAZ! 🎨 &nbsp;&nbsp;
-      </marquee>
+      <div class="marquee-track">
+        <span>🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️ &nbsp;</span>
+        <span>🎨 CRIA O TEU CARTAZ! 🎨 &nbsp; 🖨️ IMPRESSÃO A CORES! 🖨️ &nbsp; 🎇 FESTAS DA TERRINHA 2025! 🎇 &nbsp; 🖼️ O MELHOR CARTAZ DA ALDEIA! 🖼️ &nbsp;</span>
+      </div>
     </div>
 
-    <div id="container">
-      <div class="win-titlebar">
-        <span class="win-title-text"><span class="win-icon">🖼️</span> Ecrã 3 — Gerador de Cartaz</span>
-        <div class="win-controls">
-          <span class="win-btn">_</span>
-          <span class="win-btn">□</span>
-          <span class="win-btn">✕</span>
+    <!-- LAYOUT COM DUAS JANELAS WIN95 LADO A LADO -->
+    <div class="dual-window-wrapper">
+
+      <!-- JANELA ESQUERDA: FORMULÁRIO -->
+      <div id="container">
+        <div class="win-titlebar">
+          <span class="win-title-text"><span class="win-icon">🖼️</span> Ecrã 3 — Gerador de Cartaz</span>
+          <div class="win-controls">
+            <span class="win-btn">_</span>
+            <span class="win-btn">□</span>
+            <span class="win-btn">✕</span>
+          </div>
+        </div>
+
+        <div class="win-content poster-win-content">
+          <div class="deco-bar"></div>
+          <h1 class="poster-h1">Gerador de Cartaz</h1>
+
+          <h2>Informações</h2>
+
+          <label class="form-label">📍 Localização da festa</label>
+          <input type="text" id="promptInputLocalidade" placeholder="Ex: Aldeia de Cima, Viseu" />
+
+          <label class="form-label">📋 Programa</label>
+          <textarea id="promptPrograma" placeholder="Ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X&#10;DOMINGO: Missa e Arraial"></textarea>
+
+          <label class="form-label">🏷️ Nº de logos</label>
+          <input type="number" id="promptNúmeroLogos" placeholder="Ex: 3" min="0" step="1" />
+
+          <label class="form-label">📅 Data</label>
+          <input type="text" id="promptInputDia" placeholder="Ex: 23 a 25 de Junho" />
+
+          <button id="generateBtn" type="button" class="botao-gerar">
+            🖨️ GERAR CARTAZ
+          </button>
+
+          <div class="deco-bar" style="margin-top:20px;"></div>
         </div>
       </div>
 
-      <div class="win-content">
-        <div class="deco-bar"></div>
-        <h1 style="font-size:2.4em; margin-bottom:0.3em;">Gerador de Cartaz</h1>
-
-        <div class="poster-layout">
-
-          <!-- ESQUERDA: FORMULÁRIO -->
-          <div class="poster-form-panel">
-            <h2>Informações</h2>
-
-            <label class="form-label">📍 Localização da festa</label>
-            <input type="text" id="promptInputLocalidade" placeholder="Ex: Aldeia de Cima, Viseu" />
-
-            <label class="form-label">📋 Programa</label>
-            <textarea id="promptPrograma" placeholder="Ex: SEXTA: 22h — Quim Barreiros&#10;SÁBADO: 21h — Banda X&#10;DOMINGO: Missa e Arraial"></textarea>
-
-            <label class="form-label">🏷️ Nº de logos</label>
-            <input type="number" id="promptNúmeroLogos" placeholder="Ex: 3" min="0" step="1" />
-
-            <label class="form-label">📅 Data</label>
-            <input type="text" id="promptInputDia" placeholder="Ex: 23 a 25 de Junho" />
-
-            <button id="generateBtn" type="button" class="botao-gerar">
-              🖨️ GERAR CARTAZ
-            </button>
+      <!-- JANELA DIREITA: PREVIEW (SEGUNDA JANELA WIN95) -->
+      <div class="win-preview-container">
+        <div class="win-titlebar">
+          <span class="win-title-text"><span class="win-icon">🗂️</span> Pré-visualização do Cartaz</span>
+          <div class="win-controls">
+            <span class="win-btn">_</span>
+            <span class="win-btn">□</span>
+            <span class="win-btn win-btn-close" id="closePreviewBtn" title="Apagar cartaz">✕</span>
           </div>
-
-          <!-- DIREITA: CANVAS / PREVIEW -->
-          <div class="poster-preview-panel">
-            <p class="poster-preview-label">[ Pré-visualização do Cartaz ]</p>
-            <div id="sketch"></div>
-          </div>
-
         </div>
 
-        <div class="deco-bar" style="margin-top:24px;"></div>
+        <div class="preview-win-content">
+          <p class="poster-preview-label" id="previewPlaceholder">
+            [ Preenche o formulário e clica em<br>"🖨️ GERAR CARTAZ" para começar ]
+          </p>
+          <div id="sketch"></div>
+        </div>
       </div>
+
     </div>
 
     <script src="cores-cidades.js"></script>
     <script src="sketch.js"></script>
     <script>
+      // Botão X: apaga o cartaz gerado, restaura o placeholder
+      document.getElementById('closePreviewBtn').addEventListener('click', () => {
+        const canvas = document.querySelector('#sketch canvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = '#111111';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        document.getElementById('previewPlaceholder').style.display = 'block';
+      });
+
+      // Esconde o placeholder quando o cartaz começa a ser gerado
+      document.getElementById('generateBtn').addEventListener('click', () => {
+        document.getElementById('previewPlaceholder').style.display = 'none';
+      });
+
       let frame = 1;
       setInterval(() => {
         document.documentElement.style.setProperty('--cursor-frame', `url('/cursor/cursor${frame}.png') 0 0, auto`);

@@ -9,9 +9,10 @@
   <body>
 
     <div class="marquee-bar">
-      <marquee scrollamount="12">
-        ✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp;&nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp;&nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp;&nbsp; ✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp;&nbsp;
-      </marquee>
+      <div class="marquee-track">
+        <span>✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A ALDEIA! 🕯️ &nbsp;</span>
+        <span>✨ QUEM É O PADROEIRO DA FESTA? ✨ &nbsp; 🙏 ESCOLHE COM SABEDORIA! 🙏 &nbsp; ⛪ DEUS ABENÇOE A TERRINHA! ⛪ &nbsp; 🕯️ SÃO JOÃO PROTEGE A ALDEIA! 🕯️ &nbsp;</span>
+      </div>
     </div>
 
     <div id="container">
@@ -26,18 +27,17 @@
 
       <div class="win-content">
         <div class="deco-bar"></div>
-
         <h2>Escolhe o padroeiro da festa!</h2>
 
         <div class="input-row">
           <input type="text" id="promptInputSanto" placeholder="Nome do Santo..." />
-          <button id="generateBtn">⚡ Gerar Imagens</button>
+          <button id="generateBtn">Gerar Imagens</button>
         </div>
 
+        <!-- Loader: só visível depois de clicar Gerar -->
         <p id="status"></p>
 
-        <div class="star-divider">— Clica numa imagem para a selecionar —</div>
-
+        <!-- Canvas: só visível depois de clicar Gerar -->
         <div id="canvas">
           <div class="img-card" data-index="0">
             <img class="outputImage" id="img1" alt="Imagem 1" />
@@ -64,13 +64,28 @@
     <script src="script.js"></script>
     <script src="randomBg.js"></script>
     <script>
+      // Mostrar canvas e loader apenas quando o utilizador clica em Gerar
+      document.getElementById('generateBtn').addEventListener('click', () => {
+        document.getElementById('canvas').classList.add('visible');
+        document.getElementById('status').classList.add('visible');
+      });
+
+      // Selecção de imagem ao clicar no card
       document.querySelectorAll('.img-card').forEach(card => {
-        card.addEventListener('click', () => {
+        card.addEventListener('click', (e) => {
+          e.stopPropagation();
           document.querySelectorAll('.img-card').forEach(c => c.classList.remove('selected'));
           card.classList.add('selected');
           const img = card.querySelector('img');
           if (img && img.src) sessionStorage.setItem('selectedSaintImage', img.src);
         });
+      });
+
+      // Clicar fora dos cards cancela a selecção
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.img-card') && !e.target.closest('button') && !e.target.closest('input') && !e.target.closest('a')) {
+          document.querySelectorAll('.img-card').forEach(c => c.classList.remove('selected'));
+        }
       });
 
       let frame = 1;
