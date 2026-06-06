@@ -485,7 +485,7 @@ var createSketch = function (dna) {
         drawTextFitted(conteudoDinamico, x, y, w, h, sketch.NORMAL, scale);
       } else if (label.includes("Artista (Imagem)")) {
         if (conteudoDinamico) {
-          drawImageCover(conteudoDinamico, x, y, w, h);
+          drawImageContain(conteudoDinamico, x, y, w, h);
         } else {
           sketch.fill(255, 50, 100, 80);
           sketch.rect(x, y, w, h, 5);
