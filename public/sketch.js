@@ -7,7 +7,6 @@ fetch("/api/images")
   })
   .catch((err) => console.error("Erro ao carregar lista de imagens:", err));
 
-// Globals for templates
 let templatesDBGlobal = null;
 let templatesArrayGlobal = [];
 fetch("posicoes.json")
@@ -41,16 +40,13 @@ class PosterDNA {
       this.bgStyle = bgStyle;
       this.textColorMode = textColorMode;
     } else {
-      this.templateIdx = Math.floor(
-        Math.random() * templatesArrayGlobal.length,
-      );
-      this.titleFont =
-        titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
+      this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
       this.numArtists = Math.floor(Math.random() * 5) + 1;
       this.textScales = [];
       for (let i = 0; i < 5; i++) {
-        this.textScales.push(Math.random() * 0.2 + 0.9); // 0.9 to 1.1
+        this.textScales.push(Math.random() * 0.2 + 0.9);
       }
       this.baseHue = Math.floor(Math.random() * 360);
       this.useDistrictColor = Math.random() > 0.5;
@@ -61,35 +57,31 @@ class PosterDNA {
 
   crossover(partner) {
     let child = new PosterDNA();
-    child.templateIdx =
-      Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
+    child.templateIdx = Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
     child.titleFont = Math.random() > 0.5 ? this.titleFont : partner.titleFont;
     child.bodyFont = Math.random() > 0.5 ? this.bodyFont : partner.bodyFont;
-    child.numArtists =
-      Math.random() > 0.5 ? this.numArtists : partner.numArtists;
+    child.numArtists = Math.random() > 0.5 ? this.numArtists : partner.numArtists;
     child.textScales = [];
     for (let i = 0; i < 5; i++) {
       child.textScales.push(
-        Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i],
+        Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i]
       );
     }
     child.baseHue = Math.random() > 0.5 ? this.baseHue : partner.baseHue;
     child.useDistrictColor =
       Math.random() > 0.5 ? this.useDistrictColor : partner.useDistrictColor;
     child.bgStyle = Math.random() > 0.5 ? this.bgStyle : partner.bgStyle;
-    child.textColorMode = Math.random() > 0.5 ? this.textColorMode : partner.textColorMode;
+    child.textColorMode =
+      Math.random() > 0.5 ? this.textColorMode : partner.textColorMode;
     return child;
   }
 
   mutate(mutationRate = 0.2) {
     if (Math.random() < mutationRate) {
-      this.templateIdx = Math.floor(
-        Math.random() * templatesArrayGlobal.length,
-      );
+      this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
     }
     if (Math.random() < mutationRate) {
-      this.titleFont =
-        titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
     }
     if (Math.random() < mutationRate) {
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
@@ -160,7 +152,6 @@ class Population {
 
     for (let i = 1; i < this.size; i++) {
       if (i === this.size - 1) {
-        // Add one completely random poster as fallback
         newGeneration.push(new PosterDNA());
       } else {
         let partner = new PosterDNA();
@@ -187,7 +178,6 @@ var createSketch = function (dna, districtColor) {
 
     let selectedTitleFont;
     let selectedBodyFont;
-
     let paletaAtiva = null;
 
     let userData = {
@@ -211,7 +201,6 @@ var createSketch = function (dna, districtColor) {
           logos.push(sketch.loadImage("patrocinios/" + nome));
         }
       } else {
-        // Fallback corrigido para as 24 imagens
         for (let i = 1; i <= 24; i++) {
           logos.push(sketch.loadImage("patrocinios/p" + i + ".png"));
         }
@@ -226,36 +215,26 @@ var createSketch = function (dna, districtColor) {
     sketch.setup = function () {
       sketch.createCanvas(600, 850);
 
-      let inputNomeFesta = document
-        .getElementById("promptInputNomeFesta")
-        ?.value?.trim();
+      let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
       if (inputNomeFesta) userData.nomeTerrinha = inputNomeFesta.toUpperCase();
 
-      let inputLocalidade = document
-        .getElementById("promptInputLocalidade")
-        ?.value?.trim();
+      let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
       if (inputLocalidade) userData.local = inputLocalidade;
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
       if (inputDia) userData.dataEvento = inputDia;
 
-      let inputPrograma = document
-        .getElementById("promptPrograma")
-        ?.value?.trim();
+      let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
       if (inputPrograma) {
         userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
       }
 
       userData.artistas = sketch.shuffle(imagensArtistas.slice());
 
-      // Lógica de limites para Patrocinadores (0 até máximo)
-      let inputNumLogosEl = document.getElementById(
-        "promptNúmeroPatrocinadores",
-      );
+      let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
       let numLogos = 3;
 
-      // Atualiza o limite máximo na interface do utilizador de forma dinâmica
       if (inputNumLogosEl) {
         inputNumLogosEl.max = logos.length;
       }
@@ -265,7 +244,6 @@ var createSketch = function (dna, districtColor) {
         if (!isNaN(parsedNum)) numLogos = parsedNum;
       }
 
-      // GARANTIA DE LIMITES: O número não pode ser menor que 0 nem maior que o total de imagens disponíveis
       numLogos = sketch.max(0, sketch.min(numLogos, logos.length));
 
       userData.patrociniosImagens = [];
@@ -281,8 +259,8 @@ var createSketch = function (dna, districtColor) {
       let baseGrad1 = `hsl(${h1}, 65%, 22%)`;
       let baseGrad2 = `hsl(${h2}, 70%, 32%)`;
       let txt1 = `hsl(${(h1 + 180) % 360}, 80%, 85%)`;
-      let txt2 = `#FFFFFF`;
-      
+      let txt2 = "#FFFFFF";
+
       if (districtColor && dna.useDistrictColor) {
         baseGrad1 = districtColor.gradient[0];
         baseGrad2 = districtColor.gradient[1];
@@ -291,35 +269,54 @@ var createSketch = function (dna, districtColor) {
       }
 
       let finalBg1, finalBg2;
-      if (dna.bgStyle === 0) { finalBg1 = baseGrad1; finalBg2 = baseGrad2; }
-      else if (dna.bgStyle === 1) { finalBg1 = baseGrad1; finalBg2 = baseGrad1; }
-      else if (dna.bgStyle === 2) { finalBg1 = baseGrad2; finalBg2 = baseGrad2; }
-      else if (dna.bgStyle === 3) { finalBg1 = baseGrad2; finalBg2 = baseGrad1; }
-      
+      if (dna.bgStyle === 0) {
+        finalBg1 = baseGrad1;
+        finalBg2 = baseGrad2;
+      } else if (dna.bgStyle === 1) {
+        finalBg1 = baseGrad1;
+        finalBg2 = baseGrad1;
+      } else if (dna.bgStyle === 2) {
+        finalBg1 = baseGrad2;
+        finalBg2 = baseGrad2;
+      } else {
+        finalBg1 = baseGrad2;
+        finalBg2 = baseGrad1;
+      }
+
       let finalTxt1, finalTxt2;
-      if (dna.textColorMode === 0) { finalTxt1 = txt1; finalTxt2 = txt2; }
-      else if (dna.textColorMode === 1) { finalTxt1 = "#222222"; finalTxt2 = "#111111"; }
-      else if (dna.textColorMode === 2) { finalTxt1 = "#FFFFFF"; finalTxt2 = "#EEEEEE"; }
-      
-      paletaAtiva = { gradient: [finalBg1, finalBg2], text: [finalTxt1, finalTxt2] };
+      if (dna.textColorMode === 0) {
+        finalTxt1 = txt1;
+        finalTxt2 = txt2;
+      } else if (dna.textColorMode === 1) {
+        finalTxt1 = "#222222";
+        finalTxt2 = "#111111";
+      } else {
+        finalTxt1 = "#FFFFFF";
+        finalTxt2 = "#EEEEEE";
+      }
+
+      paletaAtiva = {
+        gradient: [finalBg1, finalBg2],
+        text: [finalTxt1, finalTxt2],
+      };
 
       if (typeof window !== "undefined") {
         const [bg1, bg2] = paletaAtiva.gradient;
         document.body.style.background = `linear-gradient(0deg, ${bg1}, ${bg2})`;
       }
 
-      // Evita corromper os templates com cópia profunda
       selectedTemplate = JSON.parse(
         JSON.stringify(
           templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length]
-            .annotations[0].result,
-        ),
+            .annotations[0].result
+        )
       );
+
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
 
       let artistBoxesCountSetup = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
+        b.value.rectanglelabels[0].includes("Artista (Imagem)")
       ).length;
       let numToRenderSetup = sketch.min(dna.numArtists, artistBoxesCountSetup);
       numToRenderSetup = sketch.min(numToRenderSetup, userData.artistas.length);
@@ -327,23 +324,45 @@ var createSketch = function (dna, districtColor) {
 
       if (userData.programacao && userData.programacao.length > 0) {
         let progText = userData.programacao[0];
-        if (progText.includes("{ARTISTAS}")) {
+
+        progText = progText.replace(
+          /^(SEGUNDA.*?|TERÇA.*?|QUARTA.*?|QUINTA.*?|SEXTA.*?|SÁBADO.*?|SABADO.*?|DOMINGO.*?):\s*$/gim,
+          "$1"
+        );
+
+        let numTags = (progText.match(/{ARTISTAS}/g) || []).length;
+
+        if (numTags > 0) {
           let artistNames = chosenArtists.map((img) => {
             return img.filename
               ? img.filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")
               : "Cantor Surpresa";
           });
-          let artistsString = "Animação Musical";
-          if (artistNames.length === 1) {
-            artistsString = artistNames[0];
-          } else if (artistNames.length > 1) {
-            artistsString =
-              artistNames.slice(0, -1).join(", ") +
-              " e " +
-              artistNames[artistNames.length - 1];
+
+          if (artistNames.length > 0) {
+            let chunks = Array.from({ length: numTags }, () => []);
+            let base = Math.floor(artistNames.length / numTags);
+            let remainder = artistNames.length % numTags;
+            let idx = 0;
+
+            for (let i = 0; i < numTags; i++) {
+              let count = base + (i < remainder ? 1 : 0);
+              chunks[i] = artistNames.slice(idx, idx + count);
+              idx += count;
+            }
+
+            let chunkIndex = 0;
+            progText = progText.replace(/{ARTISTAS}/g, () => {
+              let chunk = chunks[chunkIndex++];
+              if (!chunk || chunk.length === 0) return "Animação Musical";
+              if (chunk.length === 1) return chunk[0];
+              return chunk.slice(0, -1).join(", ") + " e " + chunk[chunk.length - 1];
+            });
+          } else {
+            progText = progText.replace(/{ARTISTAS}/g, "Música ao Vivo");
           }
-          progText = progText.replace(/{ARTISTAS}/g, artistsString);
         }
+
         userData.programacao = [progText];
       }
 
@@ -352,10 +371,25 @@ var createSketch = function (dna, districtColor) {
       if (document.fonts) {
         document.fonts.ready.then(() => {
           if (!document.fonts.check(`12px "${selectedTitleFont}"`)) {
-            selectedTitleFont = sketch.random(['Arial', 'Verdana', 'Georgia', 'Impact', 'Comic Sans MS', 'Trebuchet MS', 'Arial Black']);
+            selectedTitleFont = sketch.random([
+              "Arial",
+              "Verdana",
+              "Georgia",
+              "Impact",
+              "Comic Sans MS",
+              "Trebuchet MS",
+              "Arial Black",
+            ]);
           }
           if (!document.fonts.check(`12px "${selectedBodyFont}"`)) {
-            selectedBodyFont = sketch.random(['Arial', 'Verdana', 'Georgia', 'Times New Roman', 'Courier New', 'Trebuchet MS']);
+            selectedBodyFont = sketch.random([
+              "Arial",
+              "Verdana",
+              "Georgia",
+              "Times New Roman",
+              "Courier New",
+              "Trebuchet MS",
+            ]);
           }
           sketch.redraw();
         });
@@ -387,7 +421,6 @@ var createSketch = function (dna, districtColor) {
       }
 
       let finalSponsorBox = null;
-      // Só cria a área dos patrocinadores se existirem logótipos para renderizar
       if (userData.patrociniosImagens.length > 0) {
         if (allSponsorBoxes.length > 0) {
           finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
@@ -413,7 +446,6 @@ var createSketch = function (dna, districtColor) {
         }
       }
 
-      // Sistema anti-colisão (Cortar a Programação caso bata nos patrocinadores)
       if (finalSponsorBox) {
         let sponsorTop = finalSponsorBox.value.y;
         for (let box of filteredTemplate) {
@@ -421,10 +453,19 @@ var createSketch = function (dna, districtColor) {
             let label = box.value.rectanglelabels[0]
               .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
               .trim();
+
             if (!label.includes("Sant@ (Figura)")) {
               let boxBottom = box.value.y + box.value.height;
               if (boxBottom > sponsorTop) {
-                box.value.height = Math.max(2, sponsorTop - box.value.y - 1);
+                let overlap = boxBottom - sponsorTop;
+                if (overlap > box.value.height * 0.3) {
+                  box.value.y = Math.max(0, sponsorTop - box.value.height - 2);
+                  if (box.value.y === 0) {
+                    box.value.height = sponsorTop - 2;
+                  }
+                } else {
+                  box.value.height = Math.max(2, sponsorTop - box.value.y - 2);
+                }
               }
             }
           }
@@ -434,14 +475,13 @@ var createSketch = function (dna, districtColor) {
       selectedTemplate = filteredTemplate;
 
       let artistBoxesCount = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
+        b.value.rectanglelabels[0].includes("Artista (Imagem)")
       ).length;
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
       numToRender = sketch.min(numToRender, userData.artistas.length);
 
-      // Distribuição inteligente de programação por dias
       let progBoxesCount = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Programação"),
+        b.value.rectanglelabels[0].includes("Programação")
       ).length;
       let distributedProgramacao = [];
 
@@ -463,7 +503,7 @@ var createSketch = function (dna, districtColor) {
               !line.includes("H") &&
               !line.match(/^\d/)) ||
             upper.match(
-              /^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/,
+              /^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/
             )
           ) {
             if (currentDay.length > 0) days.push(currentDay.join("\n"));
@@ -506,7 +546,6 @@ var createSketch = function (dna, districtColor) {
       let currentProgBoxIndex = 0;
       let hasRenderedDate = false;
 
-      // PASSO 1: Fundo e Santo
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0]
           .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
@@ -521,7 +560,6 @@ var createSketch = function (dna, districtColor) {
         }
       }
 
-      // PASSO 2: Artistas & Patrocínios
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0]
           .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
@@ -534,15 +572,7 @@ var createSketch = function (dna, districtColor) {
         if (label.includes("Artista (Imagem)")) {
           if (currentArtistBoxIndex < numToRender) {
             let conteudoDinamico = userData.artistas[currentArtistBoxIndex];
-            renderContent(
-              label,
-              px,
-              py,
-              pWidth,
-              pHeight,
-              conteudoDinamico,
-              1.0,
-            );
+            renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, 1.0);
           }
           currentArtistBoxIndex++;
         } else if (label.includes("Patrocínios")) {
@@ -554,13 +584,12 @@ var createSketch = function (dna, districtColor) {
               pWidth,
               pHeight,
               userData.patrociniosImagens,
-              1.0,
+              1.0
             );
           }
         }
       }
 
-      // PASSO 3: Textos
       for (let box of selectedTemplate) {
         let label = box.value.rectanglelabels[0]
           .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
@@ -582,23 +611,13 @@ var createSketch = function (dna, districtColor) {
           }
 
           let conteudoDinamico = "";
-
           if (label.includes("Programação")) {
-            conteudoDinamico =
-              distributedProgramacao[currentProgBoxIndex] || "";
+            conteudoDinamico = distributedProgramacao[currentProgBoxIndex] || "";
             currentProgBoxIndex++;
           }
 
           let scale = dna.textScales[textIndex % dna.textScales.length];
-          renderContent(
-            label,
-            px,
-            py,
-            pWidth,
-            pHeight,
-            conteudoDinamico,
-            scale,
-          );
+          renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, scale);
           textIndex++;
         }
       }
@@ -675,8 +694,6 @@ var createSketch = function (dna, districtColor) {
       if (!logosArray || logosArray.length === 0) return;
 
       let gap = 15;
-      let n = logosArray.length;
-
       let lowH = 10;
       let highH = bh;
       let bestLayout = null;
@@ -729,6 +746,7 @@ var createSketch = function (dna, districtColor) {
         currentRow.items.push({ img: img, w: logoW, h: targetH });
         currentRow.width += logoW + gap;
       }
+
       if (currentRow.items.length > 0) {
         rows.push(currentRow);
       }
@@ -858,29 +876,23 @@ function selectElite(index) {
 
 document.getElementById("generateBtn").addEventListener("click", async () => {
   if (templatesArrayGlobal.length === 0) {
-    alert(
-      "Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.",
-    );
+    alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
     return;
   }
 
   const container = document.getElementById("sketch");
 
-  let inputNomeFesta = document
-    .getElementById("promptInputNomeFesta")
-    ?.value?.trim();
-  let inputLocalidade = document
-    .getElementById("promptInputLocalidade")
-    ?.value?.trim();
+  let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
+  let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
   let districtColor = null;
   let isUserInsertedLocalidade = !!inputLocalidade;
 
-  // Se algum input estiver vazio, pede à IA do Gemini para gerar apenas os vazios
   if (!inputNomeFesta || !inputLocalidade || !inputDia || !inputPrograma) {
     if (!inputLocalidade) isUserInsertedLocalidade = false;
+
     container.style.display = "block";
     container.innerHTML =
       "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar informações... 🤖</h3>";
@@ -896,6 +908,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
           programacao: inputPrograma,
         }),
       });
+
       if (!response.ok) {
         let errText = await response.text();
         try {
@@ -903,6 +916,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         } catch (e) {}
         throw new Error(errText);
       }
+
       const data = await response.json();
 
       document.getElementById("promptInputNomeFesta").value =
@@ -915,15 +929,12 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         data.programacao || inputPrograma || "";
 
       inputLocalidade = document.getElementById("promptInputLocalidade").value;
-      if (!isUserInsertedLocalidade && inputLocalidade) {
-        // It was generated by LLM, don't query district for it
-      }
     } catch (err) {
       console.error(err);
       alert(
         "Erro ao gerar texto com LLM: " +
           err.message +
-          "\nPor favor preencha os campos manualmente.",
+          "\nPor favor preencha os campos manualmente."
       );
       container.innerHTML = "";
       return;
@@ -941,6 +952,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ localidade: inputLocalidade }),
       });
+
       const data = await response.json();
       if (data.distrito && typeof obterCoresCidade === "function") {
         districtColor = obterCoresCidade(data.distrito);
@@ -950,7 +962,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
     }
   }
 
-  // Ecrã de loading
   container.style.display = "block";
   container.innerHTML =
     "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
@@ -960,7 +971,6 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
   setTimeout(() => {
     container.innerHTML = "";
-
     container.style.display = "grid";
     container.style.gridTemplateColumns = "repeat(3, 1fr)";
     container.style.gap = "15px";
@@ -985,10 +995,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       div.onclick = () => selectElite(i);
       container.appendChild(div);
 
-      new p5(
-        createSketch(globalPopulation.individuals[i], districtColor),
-        div.id,
-      );
+      new p5(createSketch(globalPopulation.individuals[i], districtColor), div.id);
     }
 
     if (globalPopulation.eliteIndex >= 0) {
@@ -1004,24 +1011,25 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       const style = document.createElement("style");
       style.id = "miniature-style";
       style.innerHTML = `
-        #sketch canvas { 
-          width: 100% !important; 
-          height: auto !important; 
-          object-fit: contain; 
-          border: 2px solid var(--win95-light, #dfdfdf); 
-          box-shadow: 4px 4px 0px #000; 
+        #sketch canvas {
+          width: 100% !important;
+          height: auto !important;
+          object-fit: contain;
+          border: 2px solid var(--win95-light, #dfdfdf);
+          box-shadow: 4px 4px 0px #000;
           transition: all 0.2s ease-in-out;
         }
-        
+
         .selected-poster canvas {
           border: 5px solid var(--neon-lime) !important;
           box-shadow: 0 0 20px var(--neon-lime), 6px 6px 0px #000 !important;
         }
-        
+
         .selected-poster::after {
           content: "✔ SELECIONADO";
           position: absolute;
-          top: 8px; left: 50%;
+          top: 8px;
+          left: 50%;
           transform: translateX(-50%);
           background: var(--neon-lime);
           color: #000;
@@ -1043,7 +1051,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 document.getElementById("exportBtn")?.addEventListener("click", () => {
   if (globalPopulation.eliteIndex >= 0) {
     const selectedCanvas = document.querySelector(
-      `#poster-mini-${globalPopulation.eliteIndex} canvas`,
+      `#poster-mini-${globalPopulation.eliteIndex} canvas`
     );
     if (selectedCanvas) {
       const link = document.createElement("a");
