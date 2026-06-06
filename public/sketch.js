@@ -462,6 +462,7 @@ var createSketch = function (dna, districtColor) {
       let textIndex = 0;
       let currentArtistBoxIndex = 0;
       let currentProgBoxIndex = 0;
+      let hasRenderedDate = false;
 
       // PASSO 1: Fundo e Santo
       for (let box of selectedTemplate) {
@@ -533,6 +534,11 @@ var createSketch = function (dna, districtColor) {
           label.includes("Local") ||
           label.includes("Programação")
         ) {
+          if (label.includes("Data do Evento")) {
+            if (hasRenderedDate) continue;
+            hasRenderedDate = true;
+          }
+
           let conteudoDinamico = "";
 
           if (label.includes("Programação")) {
