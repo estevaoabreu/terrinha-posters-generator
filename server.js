@@ -25,15 +25,25 @@ app.post("/api/generate-text", async (req, res) => {
       );
     }
 
+    const { nomeFesta, localidade, dataEvento, programacao } = req.body || {};
+
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
+    let contextText = "";
+    if (nomeFesta) contextText += `\n- Nome da festa (fornecido, mantém isto ou adapta levemente): ${nomeFesta}`;
+    if (localidade) contextText += `\n- Localidade (fornecida, mantém isto): ${localidade}`;
+    if (dataEvento) contextText += `\n- Data do evento (fornecida, mantém isto): ${dataEvento}`;
+    if (programacao) contextText += `\n- Programação (fornecida, mantém e formata se necessário, respeitando a regra dos artistas se '{ARTISTAS}' estiver presente): ${programacao}`;
+
     // Prompt para o LLM gerar dados criativos de uma festa de aldeia
-    const prompt = `Gera detalhes criativos e humorísticos para uma festa popular fictícia típica de aldeia portuguesa ("festa da terrinha"). É importante que a festa e localidade não existam, mas pareçam reais.
-Deves devolver APENAS um objeto JSON válido com as seguintes 4 chaves:
+    const prompt = `Gera detalhes criativos e humorísticos para uma festa popular fictícia típica de aldeia portuguesa ("festa da terrinha").
+O utilizador já forneceu alguns dados. Deves gerar de forma criativa APENAS os campos que faltarem e integrar os campos que o utilizador já deu: ${contextText}
+Se a localidade não tiver sido fornecida, cria uma que pareça real mas seja fictícia.
+Deves devolver APENAS um objeto JSON válido com as seguintes 4 chaves (preenchidas com os teus dados ou com os que o utilizador forneceu):
 - "nomeFesta": O nome da festa em maiúsculas (ex: FESTAS DE SÃO JOÃO).
 - "localidade": O nome da aldeia ou localidade (ex: Aldeia de Cima, Viseu).
-- "dataEvento": Uma data típica, durante o verão, fim da primavera ou início do outono (ex: 12 A 15 DE AGOSTO)
-- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE estes artistas '{ARTISTAS}', cada um deve dar um concerto num dia diferente. Não dês detalhes ou comentários sobre o programa, apenas datas, horas e títulos breves, cada linha deve ter, no máximo 7 palavras. Divide os artistas pelos vários dias. Exemplo: "SEXTA:\\n21h - Abertura da Quermesse\\n22h - Artista\\nSÁBADO:\\n15h - Torneio da Malha"`;
+- "dataEvento": Uma data típica, durante o verão, fim da primavera ou início do outono (ex: 12 A 15 DE AGOSTO).
+- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE '{ARTISTAS}', cada '{ARTISTAS}' representará um concerto num dia diferente. Não dês detalhes longos, apenas datas, horas e títulos breves, máximo 7 palavras por linha. Exemplo: "SEXTA:\n21h - Abertura da Quermesse\n22h - {ARTISTAS}\nSÁBADO:\n15h - Torneio da Malha"`;
 
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -47,6 +57,41 @@ Deves devolver APENAS um objeto JSON válido com as seguintes 4 chaves:
     res.json(JSON.parse(jsonText));
   } catch (error) {
     console.error("Erro no Gemini:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/api/identify-district", async (req, res) => {
+  try {
+    const { localidade } = req.body;
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+      throw new Error(
+        "GEMINI_API_KEY not configured. Please add it to your .env file.",
+      );
+    }
+
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+
+    const prompt = `Analisa a seguinte localidade inserida pelo utilizador: "${localidade}".
+Verifica a que região ou cidade principal de Portugal esta localidade pertence.
+Deves devolver APENAS um objeto JSON válido com a chave "distrito".
+O valor de "distrito" DEVE ser uma destas opções correspondentes (ou null se não for em Portugal ou for fictício):
+"Coimbra", "Lisboa", "Porto", "Braga", "Évora", "Aveiro", "Faro", "Viseu", "Guimarães", "Setúbal", "Viana do Castelo", "Beja", "Leiria", "Portalegre", "Santarém", "Castelo Branco", "Bragança", "Figueira da Foz", "Funchal", "Ponta Delgada".
+Exemplo: Se o utilizador inserir "Barcelos", pertence a "Braga". Se inserir "Cascais", pertence a "Lisboa".`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const jsonText = response.text;
+    res.json(JSON.parse(jsonText));
+  } catch (error) {
+    console.error("Erro no Gemini (identify-district):", error);
     res.status(500).json({ error: error.message });
   }
 });

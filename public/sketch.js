@@ -11,68 +11,107 @@ fetch("/api/images")
 let templatesDBGlobal = null;
 let templatesArrayGlobal = [];
 fetch("posicoes.json")
-  .then(res => res.json())
-  .then(data => {
+  .then((res) => res.json())
+  .then((data) => {
     templatesDBGlobal = data;
     templatesArrayGlobal = Object.values(data);
   })
-  .catch(err => console.error("Erro ao carregar posicoes.json:", err));
+  .catch((err) => console.error("Erro ao carregar posicoes.json:", err));
 
 class PosterDNA {
-  constructor(templateIdx, titleFont, bodyFont, numArtists, textScales) {
+  constructor(
+    templateIdx,
+    titleFont,
+    bodyFont,
+    numArtists,
+    textScales,
+    baseHue,
+    useDistrictColor,
+  ) {
     if (templateIdx !== undefined) {
       this.templateIdx = templateIdx;
       this.titleFont = titleFont;
       this.bodyFont = bodyFont;
       this.numArtists = numArtists;
       this.textScales = textScales;
+      this.baseHue = baseHue;
+      this.useDistrictColor = useDistrictColor;
     } else {
-      this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
-      this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.templateIdx = Math.floor(
+        Math.random() * templatesArrayGlobal.length,
+      );
+      this.titleFont =
+        titleFonts[Math.floor(Math.random() * titleFonts.length)];
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
       this.numArtists = Math.floor(Math.random() * 5) + 1;
       this.textScales = [];
       for (let i = 0; i < 5; i++) {
         this.textScales.push(Math.random() * 0.2 + 0.9); // 0.9 to 1.1
       }
+      this.baseHue = Math.floor(Math.random() * 360);
+      this.useDistrictColor = Math.random() > 0.5;
     }
   }
 
   crossover(partner) {
     let child = new PosterDNA();
-    child.templateIdx = Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
+    child.templateIdx =
+      Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
     child.titleFont = Math.random() > 0.5 ? this.titleFont : partner.titleFont;
     child.bodyFont = Math.random() > 0.5 ? this.bodyFont : partner.bodyFont;
-    child.numArtists = Math.random() > 0.5 ? this.numArtists : partner.numArtists;
+    child.numArtists =
+      Math.random() > 0.5 ? this.numArtists : partner.numArtists;
     child.textScales = [];
     for (let i = 0; i < 5; i++) {
-      child.textScales.push(Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i]);
+      child.textScales.push(
+        Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i],
+      );
     }
+    child.baseHue = Math.random() > 0.5 ? this.baseHue : partner.baseHue;
+    child.useDistrictColor =
+      Math.random() > 0.5 ? this.useDistrictColor : partner.useDistrictColor;
     return child;
   }
 
   mutate(mutationRate = 0.2) {
     if (Math.random() < mutationRate) {
-       this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
+      this.templateIdx = Math.floor(
+        Math.random() * templatesArrayGlobal.length,
+      );
     }
     if (Math.random() < mutationRate) {
-       this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.titleFont =
+        titleFonts[Math.floor(Math.random() * titleFonts.length)];
     }
     if (Math.random() < mutationRate) {
-       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
+      this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
     }
     if (Math.random() < mutationRate) {
-       this.numArtists = Math.floor(Math.random() * 5) + 1;
+      this.numArtists = Math.floor(Math.random() * 5) + 1;
     }
     for (let i = 0; i < 5; i++) {
       if (Math.random() < mutationRate) {
         this.textScales[i] = Math.random() * 0.2 + 0.9;
       }
     }
+    if (Math.random() < mutationRate) {
+      this.baseHue = Math.floor(Math.random() * 360);
+    }
+    if (Math.random() < mutationRate) {
+      this.useDistrictColor = !this.useDistrictColor;
+    }
   }
 
   getCopy() {
-    return new PosterDNA(this.templateIdx, this.titleFont, this.bodyFont, this.numArtists, [...this.textScales]);
+    return new PosterDNA(
+      this.templateIdx,
+      this.titleFont,
+      this.bodyFont,
+      this.numArtists,
+      [...this.textScales],
+      this.baseHue,
+      this.useDistrictColor,
+    );
   }
 }
 
@@ -80,7 +119,7 @@ class Population {
   constructor(size) {
     this.individuals = [];
     this.size = size;
-    this.eliteIndex = -1; 
+    this.eliteIndex = -1;
   }
 
   initialize() {
@@ -106,18 +145,18 @@ class Population {
     for (let i = 1; i < this.size; i++) {
       let partner = new PosterDNA();
       let child = eliteDNA.crossover(partner);
-      child.mutate(0.3); 
+      child.mutate(0.3);
       newGeneration.push(child);
     }
 
     this.individuals = newGeneration;
-    this.eliteIndex = 0; 
+    this.eliteIndex = 0;
   }
 }
 
 let globalPopulation = new Population(6);
 
-var createSketch = function (dna) {
+var createSketch = function (dna, districtColor) {
   return function (sketch) {
     let selectedTemplate;
     let imagensArtistas = [];
@@ -136,7 +175,7 @@ var createSketch = function (dna) {
       local: "Largo da Igreja, Ribeira",
       programacao: [],
       artistas: [],
-      patrociniosImagens: []
+      patrociniosImagens: [],
     };
 
     sketch.preload = function () {
@@ -166,16 +205,22 @@ var createSketch = function (dna) {
     sketch.setup = function () {
       sketch.createCanvas(600, 850);
 
-      let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
+      let inputNomeFesta = document
+        .getElementById("promptInputNomeFesta")
+        ?.value?.trim();
       if (inputNomeFesta) userData.nomeTerrinha = inputNomeFesta.toUpperCase();
 
-      let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+      let inputLocalidade = document
+        .getElementById("promptInputLocalidade")
+        ?.value?.trim();
       if (inputLocalidade) userData.local = inputLocalidade;
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
       if (inputDia) userData.dataEvento = inputDia;
 
-      let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
+      let inputPrograma = document
+        .getElementById("promptPrograma")
+        ?.value?.trim();
       if (inputPrograma) {
         userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
       }
@@ -183,20 +228,22 @@ var createSketch = function (dna) {
       userData.artistas = sketch.shuffle(imagensArtistas.slice());
 
       // Lógica de limites para Patrocinadores (0 até máximo)
-      let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
+      let inputNumLogosEl = document.getElementById(
+        "promptNúmeroPatrocinadores",
+      );
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
-      let numLogos = 3; 
-      
+      let numLogos = 3;
+
       // Atualiza o limite máximo na interface do utilizador de forma dinâmica
       if (inputNumLogosEl) {
-         inputNumLogosEl.max = logos.length;
+        inputNumLogosEl.max = logos.length;
       }
-      
+
       if (inputNumLogos && inputNumLogos.trim() !== "") {
         let parsedNum = parseInt(inputNumLogos, 10);
         if (!isNaN(parsedNum)) numLogos = parsedNum;
       }
-      
+
       // GARANTIA DE LIMITES: O número não pode ser menor que 0 nem maior que o total de imagens disponíveis
       numLogos = sketch.max(0, sketch.min(numLogos, logos.length));
 
@@ -208,24 +255,36 @@ var createSketch = function (dna) {
         }
       }
 
-      if (typeof resolverPaleta === "function") {
-        paletaAtiva = resolverPaleta(inputLocalidade || null);
-        if (typeof aplicarGradienteFundo === "function") {
-          aplicarGradienteFundo(inputLocalidade || null);
-        }
+      if (districtColor && dna.useDistrictColor) {
+        paletaAtiva = districtColor;
       } else {
-        paletaAtiva = {
-          gradient: ["#140028", "#2E0052"],
-          text: ["#FFD700", "#FFFFFF"],
-        };
+        const h1 = dna.baseHue;
+        const h2 = (h1 + 40) % 360;
+        const grad1 = `hsl(${h1}, 65%, 22%)`;
+        const grad2 = `hsl(${h2}, 70%, 32%)`;
+        const txt1 = `hsl(${(h1 + 180) % 360}, 80%, 85%)`;
+        const txt2 = `#FFFFFF`;
+        paletaAtiva = { gradient: [grad1, grad2], text: [txt1, txt2] };
+      }
+
+      if (typeof window !== "undefined") {
+        const [bg1, bg2] = paletaAtiva.gradient;
+        document.body.style.background = `linear-gradient(0deg, ${bg1}, ${bg2})`;
       }
 
       // Evita corromper os templates com cópia profunda
-      selectedTemplate = JSON.parse(JSON.stringify(templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length].annotations[0].result));
+      selectedTemplate = JSON.parse(
+        JSON.stringify(
+          templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length]
+            .annotations[0].result,
+        ),
+      );
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
 
-      let artistBoxesCountSetup = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Artista (Imagem)")).length;
+      let artistBoxesCountSetup = selectedTemplate.filter((b) =>
+        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
+      ).length;
       let numToRenderSetup = sketch.min(dna.numArtists, artistBoxesCountSetup);
       numToRenderSetup = sketch.min(numToRenderSetup, userData.artistas.length);
       let chosenArtists = userData.artistas.slice(0, numToRenderSetup);
@@ -233,14 +292,19 @@ var createSketch = function (dna) {
       if (userData.programacao && userData.programacao.length > 0) {
         let progText = userData.programacao[0];
         if (progText.includes("{ARTISTAS}")) {
-          let artistNames = chosenArtists.map(img => {
-            return img.filename ? img.filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ") : "Cantor Surpresa";
+          let artistNames = chosenArtists.map((img) => {
+            return img.filename
+              ? img.filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")
+              : "Cantor Surpresa";
           });
           let artistsString = "Animação Musical";
           if (artistNames.length === 1) {
             artistsString = artistNames[0];
           } else if (artistNames.length > 1) {
-            artistsString = artistNames.slice(0, -1).join(", ") + " e " + artistNames[artistNames.length - 1];
+            artistsString =
+              artistNames.slice(0, -1).join(", ") +
+              " e " +
+              artistNames[artistNames.length - 1];
           }
           progText = progText.replace(/{ARTISTAS}/g, artistsString);
         }
@@ -268,12 +332,12 @@ var createSketch = function (dna) {
       for (let box of selectedTemplate) {
         let rawLabel = box.value.rectanglelabels[0];
         let label = rawLabel.replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
-        
+
         if (!label.includes("Patrocínios")) {
-          filteredTemplate.push(box); 
+          filteredTemplate.push(box);
           if (!label.includes("Sant@ (Figura)")) {
-             let boxBottom = box.value.y + box.value.height;
-             if (boxBottom > lowestElementY) lowestElementY = boxBottom;
+            let boxBottom = box.value.y + box.value.height;
+            if (boxBottom > lowestElementY) lowestElementY = boxBottom;
           }
         } else {
           allSponsorBoxes.push(box);
@@ -287,15 +351,21 @@ var createSketch = function (dna) {
           finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
             let prevArea = prev.value.width * prev.value.height;
             let currArea = current.value.width * current.value.height;
-            return (currArea > prevArea) ? current : prev;
+            return currArea > prevArea ? current : prev;
           });
           filteredTemplate.push(finalSponsorBox);
         } else {
-          let startY = Math.max(lowestElementY + 2, 80); 
-          if (startY > 90) startY = 88; 
-          
+          let startY = Math.max(lowestElementY + 2, 80);
+          if (startY > 90) startY = 88;
+
           finalSponsorBox = {
-            value: { x: 5, y: startY, width: 90, height: 97 - startY, rectanglelabels: ["Patrocínios"] }
+            value: {
+              x: 5,
+              y: startY,
+              width: 90,
+              height: 97 - startY,
+              rectanglelabels: ["Patrocínios"],
+            },
           };
           filteredTemplate.push(finalSponsorBox);
         }
@@ -306,11 +376,13 @@ var createSketch = function (dna) {
         let sponsorTop = finalSponsorBox.value.y;
         for (let box of filteredTemplate) {
           if (box !== finalSponsorBox) {
-            let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+            let label = box.value.rectanglelabels[0]
+              .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
+              .trim();
             if (!label.includes("Sant@ (Figura)")) {
               let boxBottom = box.value.y + box.value.height;
               if (boxBottom > sponsorTop) {
-                 box.value.height = Math.max(2, sponsorTop - box.value.y - 1);
+                box.value.height = Math.max(2, sponsorTop - box.value.y - 1);
               }
             }
           }
@@ -319,56 +391,71 @@ var createSketch = function (dna) {
 
       selectedTemplate = filteredTemplate;
 
-      let artistBoxesCount = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Artista (Imagem)")).length;
+      let artistBoxesCount = selectedTemplate.filter((b) =>
+        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
+      ).length;
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
       numToRender = sketch.min(numToRender, userData.artistas.length);
 
       // Distribuição inteligente de programação por dias
-      let progBoxesCount = selectedTemplate.filter(b => b.value.rectanglelabels[0].includes("Programação")).length;
+      let progBoxesCount = selectedTemplate.filter((b) =>
+        b.value.rectanglelabels[0].includes("Programação"),
+      ).length;
       let distributedProgramacao = [];
-      
+
       if (progBoxesCount > 0) {
         let progText = userData.programacao[0] || "";
-        let lines = progText.split(/\n/).map(l => l.trim()).filter(l => l !== "");
-        
+        let lines = progText
+          .split(/\n/)
+          .map((l) => l.trim())
+          .filter((l) => l !== "");
+
         let days = [];
         let currentDay = [];
-        
+
         for (let line of lines) {
-           let upper = line.toUpperCase();
-           if ((upper === line && line.length > 3 && !line.includes("H") && !line.match(/^\d/)) || upper.match(/^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/)) {
-               if(currentDay.length > 0) days.push(currentDay.join('\n'));
-               currentDay = [line];
-           } else {
-               currentDay.push(line);
-           }
+          let upper = line.toUpperCase();
+          if (
+            (upper === line &&
+              line.length > 3 &&
+              !line.includes("H") &&
+              !line.match(/^\d/)) ||
+            upper.match(
+              /^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/,
+            )
+          ) {
+            if (currentDay.length > 0) days.push(currentDay.join("\n"));
+            currentDay = [line];
+          } else {
+            currentDay.push(line);
+          }
         }
-        if (currentDay.length > 0) days.push(currentDay.join('\n'));
+        if (currentDay.length > 0) days.push(currentDay.join("\n"));
 
         if (progBoxesCount === 1) {
-           distributedProgramacao = [progText]; 
+          distributedProgramacao = [progText];
         } else if (days.length > 1) {
-           let chunks = Array.from({length: progBoxesCount}, () => []);
-           let base = Math.floor(days.length / progBoxesCount);
-           let remainder = days.length % progBoxesCount;
-           let idx = 0;
-           for (let i = 0; i < progBoxesCount; i++) {
-              let count = base + (i < remainder ? 1 : 0);
-              chunks[i] = days.slice(idx, idx + count);
-              idx += count;
-           }
-           distributedProgramacao = chunks.map(c => c.join('\n\n'));
+          let chunks = Array.from({ length: progBoxesCount }, () => []);
+          let base = Math.floor(days.length / progBoxesCount);
+          let remainder = days.length % progBoxesCount;
+          let idx = 0;
+          for (let i = 0; i < progBoxesCount; i++) {
+            let count = base + (i < remainder ? 1 : 0);
+            chunks[i] = days.slice(idx, idx + count);
+            idx += count;
+          }
+          distributedProgramacao = chunks.map((c) => c.join("\n\n"));
         } else {
-           let chunks = Array.from({length: progBoxesCount}, () => []);
-           let base = Math.floor(lines.length / progBoxesCount);
-           let remainder = lines.length % progBoxesCount;
-           let idx = 0;
-           for (let i = 0; i < progBoxesCount; i++) {
-              let count = base + (i < remainder ? 1 : 0);
-              chunks[i] = lines.slice(idx, idx + count);
-              idx += count;
-           }
-           distributedProgramacao = chunks.map(c => c.join('\n'));
+          let chunks = Array.from({ length: progBoxesCount }, () => []);
+          let base = Math.floor(lines.length / progBoxesCount);
+          let remainder = lines.length % progBoxesCount;
+          let idx = 0;
+          for (let i = 0; i < progBoxesCount; i++) {
+            let count = base + (i < remainder ? 1 : 0);
+            chunks[i] = lines.slice(idx, idx + count);
+            idx += count;
+          }
+          distributedProgramacao = chunks.map((c) => c.join("\n"));
         }
       }
 
@@ -378,7 +465,9 @@ var createSketch = function (dna) {
 
       // PASSO 1: Fundo e Santo
       for (let box of selectedTemplate) {
-        let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+        let label = box.value.rectanglelabels[0]
+          .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
+          .trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
         let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
         let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
@@ -391,7 +480,9 @@ var createSketch = function (dna) {
 
       // PASSO 2: Artistas & Patrocínios
       for (let box of selectedTemplate) {
-        let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+        let label = box.value.rectanglelabels[0]
+          .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
+          .trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
         let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
         let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
@@ -400,34 +491,66 @@ var createSketch = function (dna) {
         if (label.includes("Artista (Imagem)")) {
           if (currentArtistBoxIndex < numToRender) {
             let conteudoDinamico = userData.artistas[currentArtistBoxIndex];
-            renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, 1.0);
+            renderContent(
+              label,
+              px,
+              py,
+              pWidth,
+              pHeight,
+              conteudoDinamico,
+              1.0,
+            );
           }
           currentArtistBoxIndex++;
         } else if (label.includes("Patrocínios")) {
           if (box === finalSponsorBox) {
-            renderContent(label, px, py, pWidth, pHeight, userData.patrociniosImagens, 1.0);
+            renderContent(
+              label,
+              px,
+              py,
+              pWidth,
+              pHeight,
+              userData.patrociniosImagens,
+              1.0,
+            );
           }
         }
       }
 
       // PASSO 3: Textos
       for (let box of selectedTemplate) {
-        let label = box.value.rectanglelabels[0].replace(/[\u200B-\u200D\uFEFF\u2060]/g, "").trim();
+        let label = box.value.rectanglelabels[0]
+          .replace(/[\u200B-\u200D\uFEFF\u2060]/g, "")
+          .trim();
         let px = sketch.map(box.value.x, 0, 100, 0, sketch.width);
         let py = sketch.map(box.value.y, 0, 100, 0, sketch.height);
         let pWidth = sketch.map(box.value.width, 0, 100, 0, sketch.width);
         let pHeight = sketch.map(box.value.height, 0, 100, 0, sketch.height);
 
-        if (label.includes("Nome da Terrinha") || label.includes("Data do Evento") || label.includes("Local") || label.includes("Programação")) {
+        if (
+          label.includes("Nome da Terrinha") ||
+          label.includes("Data do Evento") ||
+          label.includes("Local") ||
+          label.includes("Programação")
+        ) {
           let conteudoDinamico = "";
-          
+
           if (label.includes("Programação")) {
-             conteudoDinamico = distributedProgramacao[currentProgBoxIndex] || "";
-             currentProgBoxIndex++;
+            conteudoDinamico =
+              distributedProgramacao[currentProgBoxIndex] || "";
+            currentProgBoxIndex++;
           }
-          
+
           let scale = dna.textScales[textIndex % dna.textScales.length];
-          renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, scale);
+          renderContent(
+            label,
+            px,
+            py,
+            pWidth,
+            pHeight,
+            conteudoDinamico,
+            scale,
+          );
           textIndex++;
         }
       }
@@ -479,7 +602,7 @@ var createSketch = function (dna) {
         drawTextFitted(userData.dataEvento, x, y, w, h, sketch.BOLD, scale);
       } else if (label.includes("Local")) {
         sketch.fill(220, 220, 220);
-        drawTextFitted("Local: " + userData.local, x, y, w, h, sketch.NORMAL, scale);
+        drawTextFitted(userData.local, x, y, w, h, sketch.NORMAL, scale);
       } else if (label.includes("Programação")) {
         sketch.fill(255);
         drawTextFitted(conteudoDinamico, x, y, w, h, sketch.NORMAL, scale);
@@ -503,36 +626,36 @@ var createSketch = function (dna) {
     function drawSponsorsFlex(logosArray, bx, by, bw, bh) {
       if (!logosArray || logosArray.length === 0) return;
 
-      let gap = 15; 
+      let gap = 15;
       let n = logosArray.length;
-      
-      let lowH = 10; 
+
+      let lowH = 10;
       let highH = bh;
       let bestLayout = null;
-      let iterations = 30; 
-      
+      let iterations = 30;
+
       while (iterations-- > 0) {
         let midH = (lowH + highH) / 2;
         let layout = testFlexLayout(logosArray, bw, midH, gap);
-        
+
         if (layout.totalHeight <= bh) {
-          bestLayout = layout; 
-          lowH = midH; 
+          bestLayout = layout;
+          lowH = midH;
         } else {
-          highH = midH; 
+          highH = midH;
         }
       }
-      
+
       if (!bestLayout) {
-        bestLayout = testFlexLayout(logosArray, bw, 15, gap); 
+        bestLayout = testFlexLayout(logosArray, bw, 15, gap);
       }
 
       let startY = by + (bh - bestLayout.totalHeight) / 2;
-      
+
       for (let row of bestLayout.rows) {
-        let startX = bx + (bw - row.width) / 2; 
+        let startX = bx + (bw - row.width) / 2;
         let currentX = startX;
-        
+
         for (let item of row.items) {
           drawImageContain(item.img, currentX, startY, item.w, item.h);
           currentX += item.w + gap;
@@ -544,43 +667,44 @@ var createSketch = function (dna) {
     function testFlexLayout(logosArray, maxW, targetH, gap) {
       let rows = [];
       let currentRow = { width: 0, items: [] };
-      
+
       for (let img of logosArray) {
-        let aspect = (img && img.width > 0 && img.height > 0) ? img.width / img.height : 1;
-        let logoW = targetH * aspect; 
-        
+        let aspect =
+          img && img.width > 0 && img.height > 0 ? img.width / img.height : 1;
+        let logoW = targetH * aspect;
+
         if (currentRow.width + logoW > maxW && currentRow.items.length > 0) {
           rows.push(currentRow);
           currentRow = { width: 0, items: [] };
         }
-        
+
         currentRow.items.push({ img: img, w: logoW, h: targetH });
         currentRow.width += logoW + gap;
       }
       if (currentRow.items.length > 0) {
         rows.push(currentRow);
       }
-      
-      for (let r of rows) r.width -= gap; 
-      
+
+      for (let r of rows) r.width -= gap;
+
       let totalHeight = rows.length * targetH + (rows.length - 1) * gap;
       return { rows: rows, totalHeight: totalHeight, rowHeight: targetH };
     }
 
     function getWrappedTextHeight(txt, boxWidth) {
-      let paragraphs = txt.split('\n');
+      let paragraphs = txt.split("\n");
       let totalHeight = 0;
       let leading = sketch.textLeading();
-      
+
       for (let p of paragraphs) {
-        let words = p.split(' ');
+        let words = p.split(" ");
         let currentLine = "";
         let lineCount = 1;
-        
+
         for (let i = 0; i < words.length; i++) {
           let wordWidth = sketch.textWidth(words[i]);
           if (wordWidth > boxWidth) {
-             return Infinity; 
+            return Infinity;
           }
 
           let testLine = currentLine + words[i] + " ";
@@ -623,8 +747,8 @@ var createSketch = function (dna) {
       }
 
       optimalSize = optimalSize * scaleMultiplier;
-      if (optimalSize < 5) optimalSize = 5; 
-      
+      if (optimalSize < 5) optimalSize = 5;
+
       sketch.textSize(optimalSize);
       sketch.text(txt, x, y, w, h);
       sketch.pop();
@@ -686,54 +810,109 @@ function selectElite(index) {
 
 document.getElementById("generateBtn").addEventListener("click", async () => {
   if (templatesArrayGlobal.length === 0) {
-    alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
+    alert(
+      "Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.",
+    );
     return;
   }
 
   const container = document.getElementById("sketch");
-  
-  let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
-  let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+
+  let inputNomeFesta = document
+    .getElementById("promptInputNomeFesta")
+    ?.value?.trim();
+  let inputLocalidade = document
+    .getElementById("promptInputLocalidade")
+    ?.value?.trim();
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
-  // Se todos os inputs estiverem vazios, pede à IA do Gemini para os gerar
-  if (!inputNomeFesta && !inputLocalidade && !inputDia && !inputPrograma) {
+  let districtColor = null;
+  let isUserInsertedLocalidade = !!inputLocalidade;
+
+  // Se algum input estiver vazio, pede à IA do Gemini para gerar apenas os vazios
+  if (!inputNomeFesta || !inputLocalidade || !inputDia || !inputPrograma) {
+    if (!inputLocalidade) isUserInsertedLocalidade = false;
     container.style.display = "block";
-    container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A consultar a comissão de festas (LLM)... 🤖</h3>";
-    
+    container.innerHTML =
+      "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar informações... 🤖</h3>";
+
     try {
-      const response = await fetch("/api/generate-text", { method: "POST" });
+      const response = await fetch("/api/generate-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nomeFesta: inputNomeFesta,
+          localidade: inputLocalidade,
+          dataEvento: inputDia,
+          programacao: inputPrograma,
+        }),
+      });
       if (!response.ok) {
         let errText = await response.text();
-        try { errText = JSON.parse(errText).error; } catch(e){}
+        try {
+          errText = JSON.parse(errText).error;
+        } catch (e) {}
         throw new Error(errText);
       }
       const data = await response.json();
-      
-      document.getElementById("promptInputNomeFesta").value = data.nomeFesta || "";
-      document.getElementById("promptInputLocalidade").value = data.localidade || "";
-      document.getElementById("promptInputDia").value = data.dataEvento || "";
-      document.getElementById("promptPrograma").value = data.programacao || "";
-      
+
+      document.getElementById("promptInputNomeFesta").value =
+        data.nomeFesta || inputNomeFesta || "";
+      document.getElementById("promptInputLocalidade").value =
+        data.localidade || inputLocalidade || "";
+      document.getElementById("promptInputDia").value =
+        data.dataEvento || inputDia || "";
+      document.getElementById("promptPrograma").value =
+        data.programacao || inputPrograma || "";
+
+      inputLocalidade = document.getElementById("promptInputLocalidade").value;
+      if (!isUserInsertedLocalidade && inputLocalidade) {
+        // It was generated by LLM, don't query district for it
+      }
     } catch (err) {
       console.error(err);
-      alert("Erro ao gerar texto com LLM: " + err.message + "\nPor favor preencha os campos manualmente.");
+      alert(
+        "Erro ao gerar texto com LLM: " +
+          err.message +
+          "\nPor favor preencha os campos manualmente.",
+      );
       container.innerHTML = "";
       return;
     }
   }
 
+  if (isUserInsertedLocalidade) {
+    try {
+      container.style.display = "block";
+      container.innerHTML =
+        "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A procurar no mapa... 🗺️</h3>";
+
+      const response = await fetch("/api/identify-district", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ localidade: inputLocalidade }),
+      });
+      const data = await response.json();
+      if (data.distrito && typeof obterCoresCidade === "function") {
+        districtColor = obterCoresCidade(data.distrito);
+      }
+    } catch (err) {
+      console.error("Failed to identify district:", err);
+    }
+  }
+
   // Ecrã de loading
   container.style.display = "block";
-  container.innerHTML = "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
-  
-  const exportBtn = document.getElementById('exportBtn');
-  if (exportBtn) exportBtn.style.display = 'none';
+  container.innerHTML =
+    "<h3 style='color: var(--neon-lime, #39ff14); width: 100%; text-align: center; padding: 40px 0; font-size: 1.5rem; text-shadow: 2px 2px 0px #000;'>A gerar cartazes, por favor aguarde... ⏳</h3>";
+
+  const exportBtn = document.getElementById("exportBtn");
+  if (exportBtn) exportBtn.style.display = "none";
 
   setTimeout(() => {
     container.innerHTML = "";
-    
+
     container.style.display = "grid";
     container.style.gridTemplateColumns = "repeat(3, 1fr)";
     container.style.gap = "15px";
@@ -753,21 +932,24 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       div.style.width = "100%";
       div.style.display = "flex";
       div.style.justifyContent = "center";
-      div.style.position = "relative"; 
+      div.style.position = "relative";
       div.style.cursor = "pointer";
       div.onclick = () => selectElite(i);
       container.appendChild(div);
 
-      new p5(createSketch(globalPopulation.individuals[i]), div.id);
+      new p5(
+        createSketch(globalPopulation.individuals[i], districtColor),
+        div.id,
+      );
     }
 
     if (globalPopulation.eliteIndex >= 0) {
       setTimeout(() => {
         selectElite(globalPopulation.eliteIndex);
-        if (exportBtn) exportBtn.style.display = 'block';
+        if (exportBtn) exportBtn.style.display = "block";
       }, 100);
     } else {
-      if (exportBtn) exportBtn.style.display = 'block';
+      if (exportBtn) exportBtn.style.display = "block";
     }
 
     if (!document.getElementById("miniature-style")) {
@@ -812,11 +994,13 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 
 document.getElementById("exportBtn")?.addEventListener("click", () => {
   if (globalPopulation.eliteIndex >= 0) {
-    const selectedCanvas = document.querySelector(`#poster-mini-${globalPopulation.eliteIndex} canvas`);
+    const selectedCanvas = document.querySelector(
+      `#poster-mini-${globalPopulation.eliteIndex} canvas`,
+    );
     if (selectedCanvas) {
-      const link = document.createElement('a');
-      link.download = 'cartaz-terrinha.png';
-      link.href = selectedCanvas.toDataURL('image/png');
+      const link = document.createElement("a");
+      link.download = "cartaz-terrinha.png";
+      link.href = selectedCanvas.toDataURL("image/png");
       link.click();
     }
   } else {
