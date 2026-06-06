@@ -27,6 +27,8 @@ class PosterDNA {
     textScales,
     baseHue,
     useDistrictColor,
+    bgStyle,
+    textColorMode
   ) {
     if (templateIdx !== undefined) {
       this.templateIdx = templateIdx;
@@ -36,6 +38,8 @@ class PosterDNA {
       this.textScales = textScales;
       this.baseHue = baseHue;
       this.useDistrictColor = useDistrictColor;
+      this.bgStyle = bgStyle;
+      this.textColorMode = textColorMode;
     } else {
       this.templateIdx = Math.floor(
         Math.random() * templatesArrayGlobal.length,
@@ -50,6 +54,8 @@ class PosterDNA {
       }
       this.baseHue = Math.floor(Math.random() * 360);
       this.useDistrictColor = Math.random() > 0.5;
+      this.bgStyle = Math.floor(Math.random() * 4);
+      this.textColorMode = Math.floor(Math.random() * 3);
     }
   }
 
@@ -70,6 +76,8 @@ class PosterDNA {
     child.baseHue = Math.random() > 0.5 ? this.baseHue : partner.baseHue;
     child.useDistrictColor =
       Math.random() > 0.5 ? this.useDistrictColor : partner.useDistrictColor;
+    child.bgStyle = Math.random() > 0.5 ? this.bgStyle : partner.bgStyle;
+    child.textColorMode = Math.random() > 0.5 ? this.textColorMode : partner.textColorMode;
     return child;
   }
 
@@ -100,6 +108,12 @@ class PosterDNA {
     if (Math.random() < mutationRate) {
       this.useDistrictColor = !this.useDistrictColor;
     }
+    if (Math.random() < mutationRate) {
+      this.bgStyle = Math.floor(Math.random() * 4);
+    }
+    if (Math.random() < mutationRate) {
+      this.textColorMode = Math.floor(Math.random() * 3);
+    }
   }
 
   getCopy() {
@@ -111,6 +125,8 @@ class PosterDNA {
       [...this.textScales],
       this.baseHue,
       this.useDistrictColor,
+      this.bgStyle,
+      this.textColorMode
     );
   }
 }
@@ -255,17 +271,32 @@ var createSketch = function (dna, districtColor) {
         }
       }
 
+      let h1 = dna.baseHue;
+      let h2 = (h1 + 40) % 360;
+      let baseGrad1 = `hsl(${h1}, 65%, 22%)`;
+      let baseGrad2 = `hsl(${h2}, 70%, 32%)`;
+      let txt1 = `hsl(${(h1 + 180) % 360}, 80%, 85%)`;
+      let txt2 = `#FFFFFF`;
+      
       if (districtColor && dna.useDistrictColor) {
-        paletaAtiva = districtColor;
-      } else {
-        const h1 = dna.baseHue;
-        const h2 = (h1 + 40) % 360;
-        const grad1 = `hsl(${h1}, 65%, 22%)`;
-        const grad2 = `hsl(${h2}, 70%, 32%)`;
-        const txt1 = `hsl(${(h1 + 180) % 360}, 80%, 85%)`;
-        const txt2 = `#FFFFFF`;
-        paletaAtiva = { gradient: [grad1, grad2], text: [txt1, txt2] };
+        baseGrad1 = districtColor.gradient[0];
+        baseGrad2 = districtColor.gradient[1];
+        txt1 = districtColor.text[0];
+        txt2 = districtColor.text[1];
       }
+
+      let finalBg1, finalBg2;
+      if (dna.bgStyle === 0) { finalBg1 = baseGrad1; finalBg2 = baseGrad2; }
+      else if (dna.bgStyle === 1) { finalBg1 = baseGrad1; finalBg2 = baseGrad1; }
+      else if (dna.bgStyle === 2) { finalBg1 = baseGrad2; finalBg2 = baseGrad2; }
+      else if (dna.bgStyle === 3) { finalBg1 = baseGrad2; finalBg2 = baseGrad1; }
+      
+      let finalTxt1, finalTxt2;
+      if (dna.textColorMode === 0) { finalTxt1 = txt1; finalTxt2 = txt2; }
+      else if (dna.textColorMode === 1) { finalTxt1 = "#222222"; finalTxt2 = "#111111"; }
+      else if (dna.textColorMode === 2) { finalTxt1 = "#FFFFFF"; finalTxt2 = "#EEEEEE"; }
+      
+      paletaAtiva = { gradient: [finalBg1, finalBg2], text: [finalTxt1, finalTxt2] };
 
       if (typeof window !== "undefined") {
         const [bg1, bg2] = paletaAtiva.gradient;
@@ -315,6 +346,12 @@ var createSketch = function (dna, districtColor) {
 
       if (document.fonts) {
         document.fonts.ready.then(() => {
+          if (!document.fonts.check(`12px "${selectedTitleFont}"`)) {
+            selectedTitleFont = sketch.random(['Arial', 'Verdana', 'Georgia', 'Impact', 'Comic Sans MS', 'Trebuchet MS', 'Arial Black']);
+          }
+          if (!document.fonts.check(`12px "${selectedBodyFont}"`)) {
+            selectedBodyFont = sketch.random(['Arial', 'Verdana', 'Georgia', 'Times New Roman', 'Courier New', 'Trebuchet MS']);
+          }
           sketch.redraw();
         });
       }
