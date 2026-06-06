@@ -159,10 +159,15 @@ class Population {
     newGeneration.push(eliteDNA);
 
     for (let i = 1; i < this.size; i++) {
-      let partner = new PosterDNA();
-      let child = eliteDNA.crossover(partner);
-      child.mutate(0.3);
-      newGeneration.push(child);
+      if (i === this.size - 1) {
+        // Add one completely random poster as fallback
+        newGeneration.push(new PosterDNA());
+      } else {
+        let partner = new PosterDNA();
+        let child = eliteDNA.crossover(partner);
+        child.mutate(0.3);
+        newGeneration.push(child);
+      }
     }
 
     this.individuals = newGeneration;
