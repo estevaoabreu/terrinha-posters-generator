@@ -43,17 +43,38 @@ Deves devolver APENAS um objeto JSON válido com as seguintes 4 chaves (preenchi
 - "nomeFesta": O nome da festa em maiúsculas (ex: FESTAS DE SÃO JOÃO).
 - "localidade": O nome da aldeia ou localidade (ex: Aldeia de Cima, Viseu).
 - "dataEvento": Uma data típica, durante o verão, fim da primavera ou início do outono (ex: 12 A 15 DE AGOSTO).
-- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa quebras de linha reais. IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE '{ARTISTAS}', cada '{ARTISTAS}' representará um concerto num dia diferente. Não dês detalhes longos, apenas datas, horas e títulos breves, máximo 7 palavras por linha. Exemplo: "SEXTA:\n21h - Abertura da Quermesse\n22h - {ARTISTAS}\nSÁBADO:\n15h - Torneio da Malha"`;
+- "programacao": O programa da festa. Deve ter 3 a 5 dias. Usa estritamente a sequência '\\n' para representar quebras de linha (não uses quebras de linha literais/reais no JSON). IMPORTANTE: Não inventes nomes de artistas musicais/cantores/bandas! Em vez disso, usa OBRIGATORIAMENTE '{ARTISTAS}', cada '{ARTISTAS}' representará um concerto num dia diferente. Não dês detalhes longos, apenas datas, horas e títulos breves, máximo 7 palavras por linha. Exemplo: "SEXTA:\\n21h - Abertura da Quermesse\\n22h - {ARTISTAS}\\nSÁBADO:\\n15h - Torneio da Malha"`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+    let retries = 3;
+    let jsonText = "";
+    
+    while (retries > 0) {
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+        jsonText = response.text;
+        
+        // Remove blocos de markdown que o LLM possa ter gerado
+        if (jsonText.startsWith("```json")) {
+           jsonText = jsonText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+        }
+        
+        // Verifica se é JSON válido
+        JSON.parse(jsonText);
+        break; // Sucesso, sai do ciclo
+      } catch (err) {
+        retries--;
+        console.warn(`Tentativa falhou, restantes ${retries}: ${err.message}`);
+        if (retries === 0) throw err;
+        await new Promise(r => setTimeout(r, 2000)); // Espera 2s antes de tentar novamente (útil para erro 503)
+      }
+    }
 
-    const jsonText = response.text;
     res.json(JSON.parse(jsonText));
   } catch (error) {
     console.error("Erro no Gemini:", error);
@@ -80,15 +101,34 @@ O valor de "distrito" DEVE ser uma destas opções correspondentes (ou null se n
 "Coimbra", "Lisboa", "Porto", "Braga", "Évora", "Aveiro", "Faro", "Viseu", "Guimarães", "Setúbal", "Viana do Castelo", "Beja", "Leiria", "Portalegre", "Santarém", "Castelo Branco", "Bragança", "Figueira da Foz", "Funchal", "Ponta Delgada".
 Exemplo: Se o utilizador inserir "Barcelos", pertence a "Braga". Se inserir "Cascais", pertence a "Lisboa".`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-      },
-    });
+    let retries = 3;
+    let jsonText = "";
+    
+    while (retries > 0) {
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
+          config: {
+            responseMimeType: "application/json",
+          },
+        });
+        jsonText = response.text;
+        
+        if (jsonText.startsWith("```json")) {
+           jsonText = jsonText.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+        }
+        
+        JSON.parse(jsonText);
+        break;
+      } catch (err) {
+        retries--;
+        console.warn(`Tentativa falhou no identify-district, restantes ${retries}: ${err.message}`);
+        if (retries === 0) throw err;
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
 
-    const jsonText = response.text;
     res.json(JSON.parse(jsonText));
   } catch (error) {
     console.error("Erro no Gemini (identify-district):", error);
