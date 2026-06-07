@@ -43,7 +43,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         imgElements[i].alt = `Imagem ${i + 1}`;
         imgElements[i].style.display = "block";
       } else {
-        console.error(`Erro ao gerar a imagem ${i + 1}`);
+        console.error(`Error generating image ${i + 1}`);
       }
     }
 

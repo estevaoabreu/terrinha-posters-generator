@@ -1,4 +1,4 @@
-function gerarCoresAutonomas(semente) {
+function generateAutonomousColors(seed) {
   const h1 = Math.floor(Math.random() * 360);
   const h2 = (h1 + 40) % 360;
   const grad1 = `hsl(${h1}, 65%, 22%)`;
@@ -12,29 +12,29 @@ function gerarCoresAutonomas(semente) {
   };
 }
 
-function resolverPaleta(nomeCidade) {
-  if (typeof obterCoresCidade === "function" && nomeCidade) {
-    const paletaCultural = obterCoresCidade(nomeCidade);
-    if (paletaCultural) return paletaCultural;
+function resolvePalette(cityName) {
+  if (typeof getCityColors === "function" && cityName) {
+    const culturalPalette = getCityColors(cityName);
+    if (culturalPalette) return culturalPalette;
   }
-  return gerarCoresAutonomas(nomeCidade || "");
+  return generateAutonomousColors(cityName || "");
 }
 
-function aplicarGradienteFundo(nomeCidade) {
-  const paleta = resolverPaleta(nomeCidade);
-  const [c1, c2] = paleta.gradient;
-  const usarRadial = Math.random() > 0.5;
+function applyBackgroundGradient(cityName) {
+  const palette = resolvePalette(cityName);
+  const [c1, c2] = palette.gradient;
+  const useRadial = Math.random() > 0.5;
 
-  document.body.style.background = usarRadial
+  document.body.style.background = useRadial
     ? `radial-gradient(ellipse at 50% 50%, ${c1}, ${c2})`
     : `linear-gradient(0deg, ${c1}, ${c2})`;
 
-  window._paletaAtiva = paleta;
+  window._activePalette = palette;
 }
 
 (function init() {
-  const cidadeGuardada = null;
-  aplicarGradienteFundo(cidadeGuardada);
+  const savedCity = null;
+  applyBackgroundGradient(savedCity);
 })();
 
 function getRandomColor() {
