@@ -1,4 +1,4 @@
-let dynamicImagesConfig = { artistas: [], logos: [] };
+let dynamicImagesConfig = { artists: [], logos: [] };
 
 fetch("/api/images")
   .then((res) => res.json())
@@ -171,29 +171,29 @@ let globalPopulation = new Population(6);
 var createSketch = function (dna, districtColor) {
   return function (sketch) {
     let selectedTemplate;
-    let imagensArtistas = [];
+    let artistImages = [];
     let logos = [];
     let saintImage;
     let saintDrawn = false;
 
     let selectedTitleFont;
     let selectedBodyFont;
-    let paletaAtiva = null;
+    let activePalette = null;
 
     let userData = {
-      nomeTerrinha: "FESTAS DE SÃO JOÃO",
-      dataEvento: "23 A 25 DE JUNHO",
-      local: "Largo da Igreja, Ribeira",
-      programacao: [],
-      artistas: [],
-      patrociniosImagens: [],
+      partyName: "FESTAS DE SÃO JOÃO",
+      eventDate: "23 A 25 DE JUNHO",
+      location: "Largo da Igreja, Ribeira",
+      schedule: [],
+      artists: [],
+      sponsorImages: [],
     };
 
     sketch.preload = function () {
-      for (let nome of dynamicImagesConfig.artistas) {
-        let img = sketch.loadImage("artistas/" + nome);
+      for (let nome of dynamicImagesConfig.artists) {
+        let img = sketch.loadImage("artists/" + nome);
         img.filename = nome;
-        imagensArtistas.push(img);
+        artistImages.push(img);
       }
 
       if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
@@ -216,20 +216,20 @@ var createSketch = function (dna, districtColor) {
       sketch.createCanvas(600, 850);
 
       let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
-      if (inputNomeFesta) userData.nomeTerrinha = inputNomeFesta.toUpperCase();
+      if (inputNomeFesta) userData.partyName = inputNomeFesta.toUpperCase();
 
       let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
-      if (inputLocalidade) userData.local = inputLocalidade;
+      if (inputLocalidade) userData.location = inputLocalidade;
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
-      if (inputDia) userData.dataEvento = inputDia;
+      if (inputDia) userData.eventDate = inputDia;
 
       let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
       if (inputPrograma) {
-        userData.programacao = [inputPrograma.replace(/\\n/g, "\n")];
+        userData.schedule = [inputPrograma.replace(/\\n/g, "\n")];
       }
 
-      userData.artistas = sketch.shuffle(imagensArtistas.slice());
+      userData.artists = sketch.shuffle(artistImages.slice());
 
       let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
@@ -246,11 +246,11 @@ var createSketch = function (dna, districtColor) {
 
       numLogos = sketch.max(0, sketch.min(numLogos, logos.length));
 
-      userData.patrociniosImagens = [];
+      userData.sponsorImages = [];
       if (logos.length > 0 && numLogos > 0) {
         let shuffledLogos = sketch.shuffle(logos.slice());
         for (let i = 0; i < numLogos; i++) {
-          userData.patrociniosImagens.push(shuffledLogos[i]);
+          userData.sponsorImages.push(shuffledLogos[i]);
         }
       }
 
@@ -295,13 +295,13 @@ var createSketch = function (dna, districtColor) {
         finalTxt2 = "#EEEEEE";
       }
 
-      paletaAtiva = {
+      activePalette = {
         gradient: [finalBg1, finalBg2],
         text: [finalTxt1, finalTxt2],
       };
 
       if (typeof window !== "undefined") {
-        const [bg1, bg2] = paletaAtiva.gradient;
+        const [bg1, bg2] = activePalette.gradient;
         document.body.style.background = `linear-gradient(0deg, ${bg1}, ${bg2})`;
       }
 
@@ -319,11 +319,11 @@ var createSketch = function (dna, districtColor) {
         b.value.rectanglelabels[0].includes("Artista (Imagem)")
       ).length;
       let numToRenderSetup = sketch.min(dna.numArtists, artistBoxesCountSetup);
-      numToRenderSetup = sketch.min(numToRenderSetup, userData.artistas.length);
-      let chosenArtists = userData.artistas.slice(0, numToRenderSetup);
+      numToRenderSetup = sketch.min(numToRenderSetup, userData.artists.length);
+      let chosenArtists = userData.artists.slice(0, numToRenderSetup);
 
-      if (userData.programacao && userData.programacao.length > 0) {
-        let progText = userData.programacao[0];
+      if (userData.schedule && userData.schedule.length > 0) {
+        let progText = userData.schedule[0];
 
         progText = progText.replace(
           /^(SEGUNDA.*?|TERÇA.*?|QUARTA.*?|QUINTA.*?|SEXTA.*?|SÁBADO.*?|SABADO.*?|DOMINGO.*?):\s*$/gim,
@@ -363,7 +363,7 @@ var createSketch = function (dna, districtColor) {
           }
         }
 
-        userData.programacao = [progText];
+        userData.schedule = [progText];
       }
 
       sketch.noLoop();
@@ -398,7 +398,7 @@ var createSketch = function (dna, districtColor) {
 
     sketch.draw = function () {
       saintDrawn = false;
-      const [bgA, bgB] = paletaAtiva.gradient;
+      const [bgA, bgB] = activePalette.gradient;
       _drawGradientBackground(bgA, bgB);
 
       let filteredTemplate = [];
@@ -421,7 +421,7 @@ var createSketch = function (dna, districtColor) {
       }
 
       let finalSponsorBox = null;
-      if (userData.patrociniosImagens.length > 0) {
+      if (userData.sponsorImages.length > 0) {
         if (allSponsorBoxes.length > 0) {
           finalSponsorBox = allSponsorBoxes.reduce((prev, current) => {
             let prevArea = prev.value.width * prev.value.height;
@@ -478,7 +478,7 @@ var createSketch = function (dna, districtColor) {
         b.value.rectanglelabels[0].includes("Artista (Imagem)")
       ).length;
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
-      numToRender = sketch.min(numToRender, userData.artistas.length);
+      numToRender = sketch.min(numToRender, userData.artists.length);
 
       let progBoxesCount = selectedTemplate.filter((b) =>
         b.value.rectanglelabels[0].includes("Programação")
@@ -486,7 +486,7 @@ var createSketch = function (dna, districtColor) {
       let distributedProgramacao = [];
 
       if (progBoxesCount > 0) {
-        let progText = userData.programacao[0] || "";
+        let progText = userData.schedule[0] || "";
         let lines = progText
           .split(/\n/)
           .map((l) => l.trim())
@@ -571,8 +571,8 @@ var createSketch = function (dna, districtColor) {
 
         if (label.includes("Artista (Imagem)")) {
           if (currentArtistBoxIndex < numToRender) {
-            let conteudoDinamico = userData.artistas[currentArtistBoxIndex];
-            renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, 1.0);
+            let dynamicContent = userData.artists[currentArtistBoxIndex];
+            renderContent(label, px, py, pWidth, pHeight, dynamicContent, 1.0);
           }
           currentArtistBoxIndex++;
         } else if (label.includes("Patrocínios")) {
@@ -583,7 +583,7 @@ var createSketch = function (dna, districtColor) {
               py,
               pWidth,
               pHeight,
-              userData.patrociniosImagens,
+              userData.sponsorImages,
               1.0
             );
           }
@@ -610,14 +610,14 @@ var createSketch = function (dna, districtColor) {
             hasRenderedDate = true;
           }
 
-          let conteudoDinamico = "";
+          let dynamicContent = "";
           if (label.includes("Programação")) {
-            conteudoDinamico = distributedProgramacao[currentProgBoxIndex] || "";
+            dynamicContent = distributedProgramacao[currentProgBoxIndex] || "";
             currentProgBoxIndex++;
           }
 
           let scale = dna.textScales[textIndex % dna.textScales.length];
-          renderContent(label, px, py, pWidth, pHeight, conteudoDinamico, scale);
+          renderContent(label, px, py, pWidth, pHeight, dynamicContent, scale);
           textIndex++;
         }
       }
@@ -649,11 +649,11 @@ var createSketch = function (dna, districtColor) {
       sketch.noStroke();
     }
 
-    function renderContent(label, x, y, w, h, conteudoDinamico, scale) {
+    function renderContent(label, x, y, w, h, dynamicContent, scale) {
       sketch.noStroke();
       sketch.textFont(`"${selectedBodyFont}"`);
 
-      const [corTitulo, corData] = paletaAtiva.text;
+      const [titleColor, dateColor] = activePalette.text;
 
       if (label.includes("Sant@ (Figura)")) {
         if (saintImage && !saintDrawn) {
@@ -661,21 +661,21 @@ var createSketch = function (dna, districtColor) {
           saintDrawn = true;
         }
       } else if (label.includes("Nome da Terrinha")) {
-        sketch.fill(corTitulo);
+        sketch.fill(titleColor);
         sketch.textFont(`"${selectedTitleFont}"`);
-        drawTextFitted(userData.nomeTerrinha, x, y, w, h, sketch.NORMAL, scale);
+        drawTextFitted(userData.partyName, x, y, w, h, sketch.NORMAL, scale);
       } else if (label.includes("Data do Evento")) {
-        sketch.fill(corData);
-        drawTextFitted(userData.dataEvento, x, y, w, h, sketch.BOLD, scale);
+        sketch.fill(dateColor);
+        drawTextFitted(userData.eventDate, x, y, w, h, sketch.BOLD, scale);
       } else if (label.includes("Local")) {
         sketch.fill(220, 220, 220);
-        drawTextFitted(userData.local, x, y, w, h, sketch.NORMAL, scale);
+        drawTextFitted(userData.location, x, y, w, h, sketch.NORMAL, scale);
       } else if (label.includes("Programação")) {
         sketch.fill(255);
-        drawTextFitted(conteudoDinamico, x, y, w, h, sketch.NORMAL, scale);
+        drawTextFitted(dynamicContent, x, y, w, h, sketch.NORMAL, scale);
       } else if (label.includes("Artista (Imagem)")) {
-        if (conteudoDinamico) {
-          drawImageContain(conteudoDinamico, x, y, w, h);
+        if (dynamicContent) {
+          drawImageContain(dynamicContent, x, y, w, h);
         } else {
           sketch.fill(255, 50, 100, 80);
           sketch.rect(x, y, w, h, 5);
@@ -684,8 +684,8 @@ var createSketch = function (dna, districtColor) {
           sketch.text("Falta Foto!", x + w / 2, y + h / 2);
         }
       } else if (label.includes("Patrocínios")) {
-        if (conteudoDinamico && conteudoDinamico.length > 0) {
-          drawSponsorsFlex(conteudoDinamico, x, y, w, h);
+        if (dynamicContent && dynamicContent.length > 0) {
+          drawSponsorsFlex(dynamicContent, x, y, w, h);
         }
       }
     }
@@ -902,10 +902,10 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          nomeFesta: inputNomeFesta,
-          localidade: inputLocalidade,
-          dataEvento: inputDia,
-          programacao: inputPrograma,
+          partyName: inputNomeFesta,
+          location: inputLocalidade,
+          eventDate: inputDia,
+          schedule: inputPrograma,
         }),
       });
 
@@ -920,13 +920,13 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       const data = await response.json();
 
       document.getElementById("promptInputNomeFesta").value =
-        data.nomeFesta || inputNomeFesta || "";
+        data.partyName || inputNomeFesta || "";
       document.getElementById("promptInputLocalidade").value =
-        data.localidade || inputLocalidade || "";
+        data.location || inputLocalidade || "";
       document.getElementById("promptInputDia").value =
-        data.dataEvento || inputDia || "";
+        data.eventDate || inputDia || "";
       document.getElementById("promptPrograma").value =
-        data.programacao || inputPrograma || "";
+        data.schedule || inputPrograma || "";
 
       inputLocalidade = document.getElementById("promptInputLocalidade").value;
     } catch (err) {
@@ -950,12 +950,12 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       const response = await fetch("/api/identify-district", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ localidade: inputLocalidade }),
+        body: JSON.stringify({ location: inputLocalidade }),
       });
 
       const data = await response.json();
-      if (data.distrito && typeof obterCoresCidade === "function") {
-        districtColor = obterCoresCidade(data.distrito);
+      if (data.distrito && typeof getCityColors === "function") {
+        districtColor = getCityColors(data.distrito);
       }
     } catch (err) {
       console.error("Failed to identify district:", err);
