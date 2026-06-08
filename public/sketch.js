@@ -1,4 +1,5 @@
 let dynamicImagesConfig = { artistas: [], logos: [] };
+let activeP5Instances = [];
 
 fetch("/api/images")
   .then((res) => res.json())
@@ -996,6 +997,8 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
   if (exportBtn) exportBtn.style.display = "none";
 
   setTimeout(() => {
+    activeP5Instances.forEach((p) => p.remove());
+    activeP5Instances = [];
     container.innerHTML = "";
     container.style.display = "grid";
     container.style.gridTemplateColumns = "repeat(3, 1fr)";
@@ -1021,10 +1024,11 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       div.onclick = () => selectElite(i);
       container.appendChild(div);
 
-      new p5(
+      let inst = new p5(
         createSketch(globalPopulation.individuals[i], districtColor),
         div.id,
       );
+      activeP5Instances.push(inst);
     }
 
     if (globalPopulation.eliteIndex >= 0) {
