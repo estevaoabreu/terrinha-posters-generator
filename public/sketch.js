@@ -1,4 +1,4 @@
-let dynamicImagesConfig = { artists: [], logos: [] };
+let dynamicImagesConfig = { artistas: [], logos: [] };
 
 fetch("/api/images")
   .then((res) => res.json())
@@ -27,7 +27,7 @@ class PosterDNA {
     baseHue,
     useDistrictColor,
     bgStyle,
-    textColorMode
+    textColorMode,
   ) {
     if (templateIdx !== undefined) {
       this.templateIdx = templateIdx;
@@ -40,8 +40,11 @@ class PosterDNA {
       this.bgStyle = bgStyle;
       this.textColorMode = textColorMode;
     } else {
-      this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
-      this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.templateIdx = Math.floor(
+        Math.random() * templatesArrayGlobal.length,
+      );
+      this.titleFont =
+        titleFonts[Math.floor(Math.random() * titleFonts.length)];
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
       this.numArtists = Math.floor(Math.random() * 5) + 1;
       this.textScales = [];
@@ -57,14 +60,16 @@ class PosterDNA {
 
   crossover(partner) {
     let child = new PosterDNA();
-    child.templateIdx = Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
+    child.templateIdx =
+      Math.random() > 0.5 ? this.templateIdx : partner.templateIdx;
     child.titleFont = Math.random() > 0.5 ? this.titleFont : partner.titleFont;
     child.bodyFont = Math.random() > 0.5 ? this.bodyFont : partner.bodyFont;
-    child.numArtists = Math.random() > 0.5 ? this.numArtists : partner.numArtists;
+    child.numArtists =
+      Math.random() > 0.5 ? this.numArtists : partner.numArtists;
     child.textScales = [];
     for (let i = 0; i < 5; i++) {
       child.textScales.push(
-        Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i]
+        Math.random() > 0.5 ? this.textScales[i] : partner.textScales[i],
       );
     }
     child.baseHue = Math.random() > 0.5 ? this.baseHue : partner.baseHue;
@@ -78,10 +83,13 @@ class PosterDNA {
 
   mutate(mutationRate = 0.2) {
     if (Math.random() < mutationRate) {
-      this.templateIdx = Math.floor(Math.random() * templatesArrayGlobal.length);
+      this.templateIdx = Math.floor(
+        Math.random() * templatesArrayGlobal.length,
+      );
     }
     if (Math.random() < mutationRate) {
-      this.titleFont = titleFonts[Math.floor(Math.random() * titleFonts.length)];
+      this.titleFont =
+        titleFonts[Math.floor(Math.random() * titleFonts.length)];
     }
     if (Math.random() < mutationRate) {
       this.bodyFont = bodyFonts[Math.floor(Math.random() * bodyFonts.length)];
@@ -118,7 +126,7 @@ class PosterDNA {
       this.baseHue,
       this.useDistrictColor,
       this.bgStyle,
-      this.textColorMode
+      this.textColorMode,
     );
   }
 }
@@ -190,10 +198,12 @@ var createSketch = function (dna, districtColor) {
     };
 
     sketch.preload = function () {
-      for (let nome of dynamicImagesConfig.artists) {
-        let img = sketch.loadImage("artists/" + nome);
-        img.filename = nome;
-        artistImages.push(img);
+      if (dynamicImagesConfig.artistas) {
+        for (let nome of dynamicImagesConfig.artistas) {
+          let img = sketch.loadImage("artistas/" + nome);
+          img.filename = nome;
+          artistImages.push(img);
+        }
       }
 
       if (dynamicImagesConfig.logos && dynamicImagesConfig.logos.length > 0) {
@@ -215,23 +225,31 @@ var createSketch = function (dna, districtColor) {
     sketch.setup = function () {
       sketch.createCanvas(600, 850);
 
-      let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
+      let inputNomeFesta = document
+        .getElementById("promptInputNomeFesta")
+        ?.value?.trim();
       if (inputNomeFesta) userData.partyName = inputNomeFesta.toUpperCase();
 
-      let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+      let inputLocalidade = document
+        .getElementById("promptInputLocalidade")
+        ?.value?.trim();
       if (inputLocalidade) userData.location = inputLocalidade;
 
       let inputDia = document.getElementById("promptInputDia")?.value?.trim();
       if (inputDia) userData.eventDate = inputDia;
 
-      let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
+      let inputPrograma = document
+        .getElementById("promptPrograma")
+        ?.value?.trim();
       if (inputPrograma) {
         userData.schedule = [inputPrograma.replace(/\\n/g, "\n")];
       }
 
       userData.artists = sketch.shuffle(artistImages.slice());
 
-      let inputNumLogosEl = document.getElementById("promptNúmeroPatrocinadores");
+      let inputNumLogosEl = document.getElementById(
+        "promptNúmeroPatrocinadores",
+      );
       let inputNumLogos = inputNumLogosEl ? inputNumLogosEl.value : "";
       let numLogos = 3;
 
@@ -308,15 +326,15 @@ var createSketch = function (dna, districtColor) {
       selectedTemplate = JSON.parse(
         JSON.stringify(
           templatesArrayGlobal[dna.templateIdx % templatesArrayGlobal.length]
-            .annotations[0].result
-        )
+            .annotations[0].result,
+        ),
       );
 
       selectedTitleFont = dna.titleFont;
       selectedBodyFont = dna.bodyFont;
 
       let artistBoxesCountSetup = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Artista (Imagem)")
+        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
       ).length;
       let numToRenderSetup = sketch.min(dna.numArtists, artistBoxesCountSetup);
       numToRenderSetup = sketch.min(numToRenderSetup, userData.artists.length);
@@ -327,7 +345,7 @@ var createSketch = function (dna, districtColor) {
 
         progText = progText.replace(
           /^(SEGUNDA.*?|TERÇA.*?|QUARTA.*?|QUINTA.*?|SEXTA.*?|SÁBADO.*?|SABADO.*?|DOMINGO.*?):\s*$/gim,
-          "$1"
+          "$1",
         );
 
         let numTags = (progText.match(/{ARTISTAS}/g) || []).length;
@@ -356,7 +374,9 @@ var createSketch = function (dna, districtColor) {
               let chunk = chunks[chunkIndex++];
               if (!chunk || chunk.length === 0) return "Animação Musical";
               if (chunk.length === 1) return chunk[0];
-              return chunk.slice(0, -1).join(", ") + " e " + chunk[chunk.length - 1];
+              return (
+                chunk.slice(0, -1).join(", ") + " e " + chunk[chunk.length - 1]
+              );
             });
           } else {
             progText = progText.replace(/{ARTISTAS}/g, "Música ao Vivo");
@@ -475,13 +495,13 @@ var createSketch = function (dna, districtColor) {
       selectedTemplate = filteredTemplate;
 
       let artistBoxesCount = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Artista (Imagem)")
+        b.value.rectanglelabels[0].includes("Artista (Imagem)"),
       ).length;
       let numToRender = sketch.min(dna.numArtists, artistBoxesCount);
       numToRender = sketch.min(numToRender, userData.artists.length);
 
       let progBoxesCount = selectedTemplate.filter((b) =>
-        b.value.rectanglelabels[0].includes("Programação")
+        b.value.rectanglelabels[0].includes("Programação"),
       ).length;
       let distributedProgramacao = [];
 
@@ -503,7 +523,7 @@ var createSketch = function (dna, districtColor) {
               !line.includes("H") &&
               !line.match(/^\d/)) ||
             upper.match(
-              /^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/
+              /^(SEGUNDA|TERÇA|QUARTA|QUINTA|SEXTA|SÁBADO|SABADO|DOMINGO)/,
             )
           ) {
             if (currentDay.length > 0) days.push(currentDay.join("\n"));
@@ -584,7 +604,7 @@ var createSketch = function (dna, districtColor) {
               pWidth,
               pHeight,
               userData.sponsorImages,
-              1.0
+              1.0,
             );
           }
         }
@@ -876,14 +896,20 @@ function selectElite(index) {
 
 document.getElementById("generateBtn").addEventListener("click", async () => {
   if (templatesArrayGlobal.length === 0) {
-    alert("Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.");
+    alert(
+      "Aguarda o carregamento dos templates (posicoes.json) e tenta de novo.",
+    );
     return;
   }
 
   const container = document.getElementById("sketch");
 
-  let inputNomeFesta = document.getElementById("promptInputNomeFesta")?.value?.trim();
-  let inputLocalidade = document.getElementById("promptInputLocalidade")?.value?.trim();
+  let inputNomeFesta = document
+    .getElementById("promptInputNomeFesta")
+    ?.value?.trim();
+  let inputLocalidade = document
+    .getElementById("promptInputLocalidade")
+    ?.value?.trim();
   let inputDia = document.getElementById("promptInputDia")?.value?.trim();
   let inputPrograma = document.getElementById("promptPrograma")?.value?.trim();
 
@@ -934,7 +960,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       alert(
         "Erro ao gerar texto com LLM: " +
           err.message +
-          "\nPor favor preencha os campos manualmente."
+          "\nPor favor preencha os campos manualmente.",
       );
       container.innerHTML = "";
       return;
@@ -995,7 +1021,10 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
       div.onclick = () => selectElite(i);
       container.appendChild(div);
 
-      new p5(createSketch(globalPopulation.individuals[i], districtColor), div.id);
+      new p5(
+        createSketch(globalPopulation.individuals[i], districtColor),
+        div.id,
+      );
     }
 
     if (globalPopulation.eliteIndex >= 0) {
@@ -1051,7 +1080,7 @@ document.getElementById("generateBtn").addEventListener("click", async () => {
 document.getElementById("exportBtn")?.addEventListener("click", () => {
   if (globalPopulation.eliteIndex >= 0) {
     const selectedCanvas = document.querySelector(
-      `#poster-mini-${globalPopulation.eliteIndex} canvas`
+      `#poster-mini-${globalPopulation.eliteIndex} canvas`,
     );
     if (selectedCanvas) {
       const link = document.createElement("a");
