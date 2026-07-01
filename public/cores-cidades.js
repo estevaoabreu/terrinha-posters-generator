@@ -79,6 +79,14 @@ const CITY_COLORS = {
     gradient: ["#003087", "#0044CC"],
     text: ["#FFFFFF", "#00CC66"],
   },
+  "Vila Real": {
+    gradient: ["#1B4332", "#2D6A4F"],
+    text: ["#FFFFFF", "#FFD700"],
+  },
+  Guarda: {
+    gradient: ["#2C3E50", "#5D6D7E"],
+    text: ["#ECF0F1", "#AAB7B8"],
+  },
 };
 
 function getCityColors(cityName) {
